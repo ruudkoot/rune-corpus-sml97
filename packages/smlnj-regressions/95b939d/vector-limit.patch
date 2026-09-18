@@ -1,0 +1,8 @@
+--- a/basis/tests/vector.sml
++++ b/basis/tests/vector.sml
+@@ -52,2 +52,4 @@
+ val test4a = (tabulate(maxLen+1, fn i => i) seq "WRONG")
+-             handle Size => "OK" | _ => "WRONG";
++             handle Size => "OK"
++                  | Overflow => if Int.maxInt = SOME maxLen then "OK" else "WRONG"
++                  | _ => "WRONG";

@@ -1,0 +1,11 @@
+--- a/basis/tests/list.sml
++++ b/basis/tests/list.sml
+@@ -58,7 +58,7 @@
+     fun checkv () = check(!v = isum);
+ end;
+ 
+-val test14 = (reset (); app incrv v16; checkv);
++val test14 = (reset (); app incrv v16; checkv());
+ 
+ val test15 = check([2,4,6,8,10,12] = map (fn i=>i*2) v16);
+ 

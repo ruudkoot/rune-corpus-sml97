@@ -1,0 +1,11 @@
+corpus-record-v1
+harness.kind	harness
+harness.timeout	600
+kind	profile
+portable.kind	recipe
+portable.recipe	packages/smlnj-regressions/95b939d/rune.record
+portable.timeout	1200
+portable.variant	amd64-linux
+tasks.0	harness
+tasks.1	portable
+tasks.count	2

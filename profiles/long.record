@@ -1,0 +1,7 @@
+corpus-record-v1
+kind	profile
+matrix.experiment	experiments/stackvm/demo.record
+matrix.kind	benchmark
+matrix.timeout	7200
+tasks.0	matrix
+tasks.count	1

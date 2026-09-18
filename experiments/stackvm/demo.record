@@ -1,0 +1,19 @@
+corpus-record-v1
+format	corpus-stack-1
+generator.source	codegen.sml
+generators.0	rune
+generators.1	poly
+generators.count	2
+iterations	5000
+kind	stackvm-experiment
+memory.mib	4096
+runtime.source	runtime.sml
+runtimes.0	poly
+runtimes.1	smlnj
+runtimes.count	2
+samples	5
+sizes.0	1000
+sizes.1	5000
+sizes.count	2
+timeout.seconds	120
+warmups	1

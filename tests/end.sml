@@ -1,0 +1,1 @@
+val () = print "CORPUS_HARNESS_TESTS_COMPLETE\n"

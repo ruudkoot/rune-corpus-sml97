@@ -1,0 +1,12 @@
+--- a/config/targets
++++ b/config/targets
+@@ -34,6 +34,9 @@
+ # but it may be interesting to look at.
+ #
+ #request src-smlnj
++request compiler
++request cm
++request system
+ 
+ # include backward-compatible versions of the Basis Library.
+ #

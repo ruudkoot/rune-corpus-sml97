@@ -1,0 +1,7 @@
+corpus-record-v1
+kind	compiler-bindings
+legacy.compiler	/REPLACE_WITH_ABSOLUTE_SMLNJ_LEGACY_STAGE2_ATTEMPT/artifact.record
+mlton.compiler	/REPLACE_WITH_ABSOLUTE_MLTON_STAGE2_ATTEMPT/artifact.record
+poly.compiler	/REPLACE_WITH_ABSOLUTE_POLYML_STAGE2_ATTEMPT/artifact.record
+rune.compiler	installed-rune
+smlnj.compiler	/REPLACE_WITH_ABSOLUTE_SMLNJ_MODERN_STAGE2_ATTEMPT/artifact.record

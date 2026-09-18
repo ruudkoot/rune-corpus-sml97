@@ -1,0 +1,39 @@
+--- a/basis/tests/array.sml
++++ b/basis/tests/array.sml
+@@ -67,7 +67,9 @@
+     check'(fn () => d sub 27 = 61);
+ 
+ val test4a = (tabulate(maxLen+1, fn i => i) seq "WRONG")
+-            handle Size => "OK" | _ => "WRONG";
++            handle Size => "OK"
++                  | Overflow => if Int.maxInt = SOME maxLen then "OK" else "WRONG"
++                  | _ => "WRONG";
+ 
+ val test4b = (tabulate(~1, fn i => i) seq "WRONG")
+             handle Size => "OK" | _ => "WRONG";
+--- a/basis/tests/word8array.sml
++++ b/basis/tests/word8array.sml
+@@ -70,7 +70,9 @@
+ val test3 = check' (fn () => d sub 27 = i2w 6);
+ 
+ val test4a = (tabulate(maxLen+1, i2w) seq "WRONG")
+-            handle Size => "OK" | _ => "WRONG";
++            handle Size => "OK"
++                  | Overflow => if Int.maxInt = SOME maxLen then "OK" else "WRONG"
++                  | _ => "WRONG";
+ 
+ val test4b = (tabulate(~1, i2w)       seq "WRONG")
+             handle Size => "OK" | _ => "WRONG";
+--- a/basis/tests/word8vector.sml
++++ b/basis/tests/word8vector.sml
+@@ -51,7 +51,9 @@
+ val test3 = check'(fn _ => d sub 27 = i2w 6);
+ 
+ val test4a = (tabulate(maxLen+1, i2w) seq "WRONG")
+-             handle Size => "OK" | _ => "WRONG";
++             handle Size => "OK"
++                  | Overflow => if Int.maxInt = SOME maxLen then "OK" else "WRONG"
++                  | _ => "WRONG";
+ 
+ val test4b = (tabulate(~1, i2w)       seq "WRONG")
+              handle Size => "OK" | _ => "WRONG";

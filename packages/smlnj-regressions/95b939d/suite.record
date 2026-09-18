@@ -1,0 +1,15 @@
+corpus-record-v1
+cases.0	list
+cases.1	vector
+cases.2	string
+cases.count	3
+kind	semantic-suite
+list.assertions	41
+list.source	basis/tests/list.sml
+list.validator	list-oracle.sml
+string.assertions	40
+string.source	basis/tests/string.sml
+string.validator	string-oracle.sml
+vector.assertions	32
+vector.source	basis/tests/vector.sml
+vector.validator	vector-oracle.sml

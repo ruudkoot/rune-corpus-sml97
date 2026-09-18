@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+mkdir -p _work/bin
+set --
+while IFS= read -r source; do
+  test -z "$source" || set -- "$@" "$source"
+done < sources.txt
+{
+  printf '%s\n\n' '$(SML_LIB)/basis/basis.mlb'
+  printf '"%s"\n' "$@" src/main.sml
+} > corpus.mlb
+exec "${RUNE:-rune}" "$@" src/main.sml -o _work/bin/corpus.rbc

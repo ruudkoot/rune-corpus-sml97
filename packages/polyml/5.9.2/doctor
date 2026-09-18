@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && pwd)
+exec "$root/bin/corpus" doctor packages/polyml/5.9.2/stage1.record "${1:-amd64-linux}"

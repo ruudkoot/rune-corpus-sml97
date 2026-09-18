@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+mkdir -p _work/bin
+set --
+while IFS= read -r source; do
+  test -z "$source" || set -- "$@" "$source"
+done < sources.txt
+while IFS= read -r source; do
+  test -z "$source" || set -- "$@" "$source"
+done < tests/sources.txt
+"${RUNE:-rune}" "$@" -o _work/bin/tests.rbc
+exec "${RUNEVM:-runevm}" _work/bin/tests.rbc

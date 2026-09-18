@@ -1,0 +1,5 @@
+corpus-record-v1
+kind	compiler-bindings
+poly.compiler	/REPLACE_WITH_ABSOLUTE_POLYML_STAGE2_ATTEMPT/artifact.record
+rune.compiler	installed-rune
+smlnj.compiler	/REPLACE_WITH_ABSOLUTE_SMLNJ_STAGE2_ATTEMPT/artifact.record

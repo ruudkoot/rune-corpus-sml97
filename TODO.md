@@ -1,0 +1,6 @@
+- Add representative Rune runtime benchmarks—the main matrix currently measures Poly/ML and SML/NJ runtimes.
+- Repeat measurements under quieter, controlled conditions.
+- Resolve or report the three MLton/Poly/ML library discrepancies.
+- Turn manual benchmark acceptance checks into committed automated tests.
+- Add CI, durable evidence retention and broader application coverage.
+  - Garbage collection of _work

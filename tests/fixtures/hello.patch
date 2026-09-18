@@ -1,0 +1,8 @@
+--- a/main.sml
++++ b/main.sml
+@@ -1,4 +1,4 @@
+ structure Hello =
+ struct
+-  val () = print "before patch\n"
++  val () = print "hello corpus\n"
+ end
