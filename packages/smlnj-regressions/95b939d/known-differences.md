@@ -42,3 +42,21 @@ Rune, Poly/ML and modern SML/NJ passed the corrected subset at
 `_work/attempts/1790285718017794-3A4F6B-1` and
 `_work/attempts/1790285718043383-3A4F89-1`. Full compiler changes are outside
 this integration fix.
+
+**Rune tests:** `~/rune`'s Basis Library suite covers the same case directly:
+`tests/basis/string.sml`'s `String.fromCString/NONE-illegal-escape` (and
+`NONE-newline`, `NONE-lone-backslash`). Running
+`sh tests/basis/run-matrix.sh --configs native:mlton string` against the same
+`mlton-20241230` reproduces them exactly, each recorded as a `HOST-BUG` in
+`tests/basis/deviations.txt` ("SOME "" instead of NONE when no character can
+be converted"); 0 unexplained failures.
+
+**Upstream status:** reported as
+[MLton/mlton#658](https://github.com/MLton/mlton/issues/658) on 2026-09-25
+(no existing report was found before that; searched `fromCString`, `escape`,
+`invalid escape`, `scanString`). `basis-library/text/string.sml`'s
+`fromCString` (current `master`) is still built from `Reader.list`,
+documented "never returns NONE" (`basis-library/util/reader.sml`), so the
+behavior described above remains present; the issue includes a minimal
+reproducer and a suggested fix, also preserved at
+`rune/docs/bugreport/mlton/String.fromCString/NONE-illegal-escape/BUGREPORT.md`.
