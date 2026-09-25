@@ -5,11 +5,17 @@ comparing SML compilers. The harness is written in SML, built by installed Rune,
 and executed by `runevm`. Pinned recipes build reference compilers and downstream
 programs, run correctness suites, and retain the evidence behind each result.
 
-SML/NJ, MLton and Poly/ML provide corpus-built reference compilers. Each result
+Rune, SML/NJ, MLton and Poly/ML provide corpus-built compiler artifacts. Rune
+versions use full Git commit hashes; installed Rune still builds and runs the
+harness and bootstraps Rune. Each result
 records its sources, selected compiler, native tools, commands and logs, so you
 can investigate both successful runs and failures. Experimental benchmarks
 compose independently built programs and runtimes. Full reproducibility is not
 promised; known gaps remain visible in the records.
+
+Rune bootstrap recipes now cover `b5ec8c8833e906cd3fe636a49e20b7c8474596dc`
+and `e840204151663baf1139c8096b566301e9ced37d`; see [Rune builds](packages/rune/README.md).
+Migration of workload selections to those artifacts is the next milestone.
 
 ## Quick start
 

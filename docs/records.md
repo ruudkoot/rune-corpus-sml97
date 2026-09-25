@@ -106,3 +106,16 @@ additive fields can be introduced without changing that header. Automation
 should select by kind, use named fields, tolerate extra fields, and retain the
 matching corpus checkout for a rerun. A future incompatible field or command
 change must document migration rather than silently reinterpreting old records.
+
+## Rune commit artifacts
+
+Rune recipes set `source.commit` and `version` to the same full 40-character
+Git commit hash. `artifact.runtime` and `artifact.library` expand to the VM and
+library paths and become `runtime.path` and `library.path` in compiler records.
+Selection requires the compiler, runtime and Basis manifest to belong to the
+verified installation. Stage-1 recipes use `compiler.kind=external-rune-seed`;
+this selection is forbidden outside Rune stage 1. Its complete external compiler,
+VM and library manifest is retained in `compiler-input.record` and linked as
+`compiler.parent`. `compiler.verify-after-build=true` rechecks the seed before
+publishing the produced artifact. Commands can use `{compiler.runtime.path}`
+and `{compiler.library.path}` from the selected parent.

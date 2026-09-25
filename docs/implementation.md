@@ -344,3 +344,24 @@ the completed initial roadmap. No files in the Rune repository were changed.
 samples, exact compiler selections, manual rerun instructions and prioritized
 follow-ups. It distinguishes the main matrix's generator builders from its
 interpreter builders: that matrix has no Rune interpreter row.
+
+## R1: commit-versioned Rune bootstraps (2026-09-25)
+
+Both requested Rune commits passed stages 1 and 2. Installed Rune remains the
+harness builder/runner and preferred external bootstrap seed. Stage 1 retains
+its complete seed compiler/VM/library manifest and a copied hosting VM; stage 2
+uses the pinned commit's freshly built VM. Both stages pass the owned smoke.
+Each stage 2 also recompiles itself to byte-identical compiler bytecode. No
+upstream source patches or edits in the main Rune checkout were needed.
+
+| Stage | Attempt ID under `_work/attempts/` | Whole attempt time |
+| --- | --- | --- |
+| b5.stage1 | `1790321872605236-276806-1` | 35.36 s |
+| b5.stage2 | `1790321939792559-276E2F-1` | 43.51 s |
+| e8.stage1 | `1790321939806686-276E37-1` | 41.68 s |
+| e8.stage2 | `1790321998750242-2779D1-1` | 53.84 s |
+
+The harness passed 59 fixture verdicts, including selection of a VM from
+its Rune artifact and rejection of an outside runtime. The current workload
+adapters still need migration to the new artifacts (R2); these bootstrap
+results do not yet claim downstream or full upstream-suite validation.

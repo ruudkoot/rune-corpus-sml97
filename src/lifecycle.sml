@@ -70,6 +70,11 @@ struct
             (Record.getStrings (Recipe.fields recipe) "tools")
           val compilerKind = getOpt (Record.find (Recipe.fields recipe) "compiler.kind", "installed-rune")
           val parent = case (compilerKind, compilerPath) of
+            ("external-rune-seed", NONE) =>
+              if Recipe.get recipe "bootstrap.stage" = "1" andalso Recipe.get recipe "name" = "rune"
+              then SOME (Artifact.externalRuneSeed {steps = steps})
+              else raise Fail "an installed Rune seed is permitted only for Rune stage 1"
+          |
             ("external-seed", NONE) =>
               if Recipe.get recipe "bootstrap.stage" <> "1" then
                 raise Fail "an external SML seed is permitted only for stage 1"
@@ -129,7 +134,10 @@ struct
                              ("compiler.record", case compilerPath of SOME p => Files.absolute p
                                 | NONE => attempt ^ "/compiler-input.record"),
                              ("compiler.root", Record.require r "root"),
-                             ("compiler.bin", OS.Path.dir (Record.require r "path"))])
+                             ("compiler.bin", OS.Path.dir (Record.require r "path"))] @
+                             List.mapPartial (fn key => Option.map
+                               (fn value => ("compiler." ^ key, value)) (Record.find r key))
+                               ["runtime.path", "library.path"])
           val selectedHash = Digest.text {steps = steps, value = Record.encode selected}
           val inputs = [("kind", "build-specification"), ("recipe.sha256", recipeHash),
                       ("source.sha256", Recipe.get recipe "source.sha256"), ("variant", variant),
@@ -224,11 +232,17 @@ struct
                    ("target", Recipe.get recipe "target"), ("word.size", Recipe.get recipe "word.size"),
                    ("configuration", Recipe.get recipe "configuration"),
                    ("compiler.parent", case compilerPath of NONE =>
-                      if compilerKind = "external-seed" then attempt ^ "/compiler-input.record"
+                      if compilerKind = "external-seed" orelse compilerKind = "external-rune-seed"
+                      then attempt ^ "/compiler-input.record"
                       else "upstream-boot-files"
                       | SOME p => Files.absolute p),
                    ("source.sha256", Recipe.get recipe "source.sha256"),
                    ("system", attempt ^ "/system.record")] @
+                  List.mapPartial (fn (input, output) => Option.map
+                    (fn value => (output, Recipe.expand bindings value))
+                    (Record.find (Recipe.fields recipe) input))
+                    [("artifact.runtime", "runtime.path"), ("artifact.library", "library.path"),
+                     ("source.commit", "source.commit")] @
                   Artifact.snapshot {steps = steps, base = source,
                     roots = List.map (Recipe.expand bindings)
                       (Record.getStrings (Recipe.fields recipe) "artifact.roots")}
@@ -241,7 +255,12 @@ struct
         in
           if phase = "fetch" then () else
             (prepare (); if phase = "patch" then () else
-              (commands "build"; artifact (); if phase = "test" then commands "test" else ()))
+              (commands "build";
+               (case parent of SOME r =>
+                  if Record.find (Recipe.fields recipe) "compiler.verify-after-build" = SOME "true"
+                  then Artifact.verify {steps = steps, record = r} else ()
+                | NONE => ());
+               artifact (); if phase = "test" then commands "test" else ()))
         end
     in
       (work (); save [("status", "passed"), ("finished", Time.toString (Time.now ()))]; attempt)

@@ -39,4 +39,16 @@ struct
   val () = CoreTests.assert ("undeclared compiler version rejected",
     ((Recipe.checkCompiler recipe [("family", "smlnj"), ("version", "0")]; false)
      handle Fail _ => true))
+  val runeRoot = work ^ "/rune"
+  val () = Files.mkdir (runeRoot ^ "/basis")
+  val () = List.app (fn file => Files.write (runeRoot ^ "/" ^ file, "fixture"))
+    ["compiler", "vm", "basis/MANIFEST"]
+  val runeManifest = Artifact.snapshot {steps = work ^ "/steps", roots = [runeRoot], base = runeRoot}
+  val runtimeRecord = [("family", "rune"), ("runtime.path", runeRoot ^ "/vm")] @ runeManifest
+  val () = CoreTests.assert ("Rune runtime selected from its compiler bundle",
+    Artifact.runeRuntime runtimeRecord = runeRoot ^ "/vm")
+  val () = CoreTests.assert ("Rune runtime from another installation rejected",
+    ((Artifact.runeRuntime (("runtime.path", work ^ "/other-vm") ::
+       List.filter (fn (key, _) => key <> "runtime.path") runtimeRecord); false)
+     handle Fail _ => true))
 end

@@ -20,16 +20,28 @@ not imply that all compilers pass every test, that full Rune compiler ports are
 finished, or that other operating systems and arbitrary benchmark formats work.
 Milestones below retain their original completion criteria and dependency order.
 
+## Extension: versioned Rune compilers
+
+The following milestones extend the completed initial roadmap:
+
+- [x] R1: Pin both requested Rune commits, build validated stages 1 and 2,
+  and record the installed bootstrap seed and matching runtime/library bundle.
+- [ ] R2: Select corpus Rune artifacts in suites, programs, experiments and
+  harness cross-checks; update profile bindings and the manual.
+- [ ] R3: Validate both versions alongside the reference compilers, preserve
+  results and manual reruns, and record any discovered compatibility failures.
+
+Commit after each completed milestone, following `AGENTS.md`.
+
 ## Project rules
 
-- **Use the installed Rune.** Build the framework with the system-installed
-  Rune compiler against its Basis libraries, and execute its bytecode with the
-  installed `runevm`. Record their identities and the Basis library identity.
-  Each invocation uses one fixed Rune installation. Do not download, build, or
-  manage Rune versions here; the Rune repository supplies the installation for
-  its own tests and benchmarks. Rune remains the harness runner; SML/NJ, MLton,
-  and Poly/ML are the three blessed reference compilers used in the harness's
-  own test suite for cross-checking, as described below.
+- **Separate the harness from compiler subjects.** Installed Rune builds and
+  runs the framework and remains the preferred initial Rune bootstrap seed.
+  Record its compiler, VM and Basis identities. Rune under test is a corpus-built
+  compiler, selected by its full source commit hash with its matching VM and
+  library. The initial commits are `b5ec8c8833e906cd3fe636a49e20b7c8474596dc`
+  and `e840204151663baf1139c8096b566301e9ced37d`. Cross-check the harness with
+  these artifacts as well as SML/NJ, MLton and Poly/ML.
 - **Keep repository boundaries clear.** `../rune` is a reference and an eventual
   consumer of this corpus. Normal corpus work must not require edits there.
   If a compiler or library bug needs a Rune change, preserve a reproducer and
