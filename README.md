@@ -18,6 +18,14 @@ and `e840204151663baf1139c8096b566301e9ced37d`; see [Rune builds](packages/rune/
 Workloads select exact Rune artifacts; the installed harness compiler is independent
 of those selections.
 
+**Rune does not currently compile SML/NJ, MLton or Poly/ML in this corpus.**
+The Rune-run harness drives their existing bootstrap processes: SML/NJ and
+Poly/ML start from upstream boot files, MLton starts from installed MLton, and
+each then rebuilds itself. There is no implemented Rune-hosted build of any of
+these three compilers, including a reduced-feature build. See the
+[build compatibility matrix](docs/compiler-compatibility.md) for the routes
+that work and the porting work still needed.
+
 ## Quick start
 
 On Linux with installed `rune`, `runevm`, GCC/G++, GNU make/binutils, curl, tar,
@@ -168,6 +176,12 @@ The **harness runner** and the **compiler selected for a workload** are differen
 roles. Rune remains the harness runner even when the selected compiler is Poly/ML.
 `cross-check` deliberately compiles and runs the harness tests with a reference
 compiler, then compares their verdicts with Rune's.
+
+The same distinction applies when the workload is a compiler build. For example,
+`bin/corpus test packages/mlton/20241230/stage2.record amd64-linux ARTIFACT`
+runs the build through the Rune harness, but `ARTIFACT` must be a matching MLton
+stage-1 compiler. MLton compiles MLton's sources. Supplying a Rune artifact to
+this recipe is rejected by its compiler-family constraint.
 
 Reference selection uses an exact artifact path, for example
 `_work/attempts/AN_ATTEMPT/artifact.record`. There is no implicit “latest MLton”
@@ -371,6 +385,8 @@ adapter. It requires the completion marker and identical ordered `PASS` lines.
 Compiler banners and other raw output remain in the logs. Results live under
 `_work/cross-checks/ID/`, with a `comparison.record` once comparison is reached.
 An earlier compilation/execution failure can leave only partial step evidence.
+This checks the harness as an SML program; it does not compile the selected
+compiler's own source code with Rune.
 
 ### Owned program builds and execution
 
@@ -890,18 +906,19 @@ any particular run.
 | Area | Available behavior and remaining work |
 | --- | --- |
 | Rune | Both requested commit versions passed stages 1 and 2, smoke and self-reproduction, 61-verdict harness cross-checks, all 611 expanded Basis verdicts and seven HaMLet checks. Workloads select their explicit artifacts and matching VMs. |
-| SML/NJ | Development 2026.2 and legacy 110.99.9 have passed stage-2 validation, harness cross-checks and the shared 113 assertions. |
-| Poly/ML | 5.9.2 has passed stage-2 validation, the selected upstream runner, the harness cross-check, the shared 113 assertions and the recorded seed-independence audit. |
-| MLton | 20241230 stages 1 and 2, selected upstream regressions and the harness cross-check have passed. The shared subset retains an investigated String.fromCString failure; see [known differences](packages/smlnj-regressions/95b939d/known-differences.md). |
+| SML/NJ | Development 2026.2 and legacy 110.99.9 bootstrap from upstream boot files, then rebuild with SML/NJ. Stage-2 validation, harness cross-checks and the shared 113 assertions passed. No Rune-hosted compiler build is implemented. |
+| Poly/ML | 5.9.2 bootstraps from its upstream image, then rebuilds with Poly/ML. Stage-2 validation, the selected upstream runner, harness cross-check, shared 113 assertions and recorded seed-independence audit passed. No Rune-hosted compiler build is implemented. |
+| MLton | 20241230 bootstraps with installed MLton, then rebuilds with corpus MLton. Both stages, selected upstream regressions and the harness cross-check passed. No Rune-hosted compiler build is implemented. The shared subset retains an investigated String.fromCString failure; see [known differences](packages/smlnj-regressions/95b939d/known-differences.md). |
 | HaMLet | 2.0.1 builds with both corpus Rune commits and Poly/ML 5.9.2 passed the corrected smoke test and six upstream conformance cases. |
 | Expanded Basis suite | Both Rune commits and both SML/NJ versions passed all 611 verdicts; MLton retains the String failure and Poly/ML retains Substring/Word8 differences, with documented reproducers. |
 | Owned programs | Build/export adapters exist for all four compiler families. Rune, Poly/ML and modern SML/NJ paths have been exercised with the stack-machine fixture. |
 | Benchmarks | The two-Rune acceptance matrix passed eight configurations; its 16 samples rounded to zero and do not measure comparative performance. The earlier main matrix completed eight configurations with five measured samples each. Wrong-output, missing-binding and timeout acceptance checks passed, as did a compiler-option binding. Large timing variation prevents a reliable compiler ranking. General workloads and extra flags for Poly/ML/SML/NJ remain unsupported. |
 | Profiles | The versioned Rune profile passed all eight tasks. Regression with corpus Rune completed 16 tasks with 13 passes and the same three documented reference failures. Quick and long retain their earlier acceptance evidence. |
 
-The validated host is x86-64 Linux. Other targets and complete Rune ports of the
-reference compilers are not implied by the available adapters. See
-[compiler compatibility](docs/compiler-compatibility.md) for the assessed blockers.
+The validated host is x86-64 Linux. Other targets are unvalidated. Building the
+three reference compiler implementations with Rune remains future work; the
+available workload adapters do not provide those build routes. See
+[compiler compatibility](docs/compiler-compatibility.md) for the assessed requirements.
 
 Reproduction remains partial. Transitive dependencies can be unobserved, native
 tools and system files can drift, and current specifications fingerprint harness

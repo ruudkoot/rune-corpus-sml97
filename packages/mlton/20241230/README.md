@@ -1,5 +1,9 @@
 # MLton 20241230
 
+**MLton builds MLton in these recipes.** Rune runs the corpus harness that
+orchestrates the build. There is no implemented Rune-hosted MLton build,
+including a reduced-feature one.
+
 The recipe builds compiler, runtime, Basis and libraries with the declared seed,
 then builds auxiliary tools with `SELF_COMPILE=true` using that new compiler and
 its bundled libraries. An earlier attempt built the compiler successfully but
@@ -41,7 +45,7 @@ The wrapper commands currently address stage 1. Stage 2 uses
 `bin/corpus test packages/mlton/20241230/stage2.record amd64-linux
 PATH/TO/STAGE1/artifact.record`. A successful stage-1 result is bootstrap-only.
 
-Rune compatibility is not claimed. A direct Rune build needs an MLB adapter and
+Compiling MLton's sources with Rune needs an MLB adapter and
 a host-service adapter based on the existing alternative-host stubs and verified
 Basis coverage. The compatibility notes identify those requirements; that adapter
 is not implemented. The upstream build paths remain intact.

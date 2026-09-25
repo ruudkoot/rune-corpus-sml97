@@ -12,6 +12,13 @@ because it detects documented reference-library differences. The benchmark
 workflow passes its acceptance checks, but these timings do not establish a
 reliable compiler performance ranking.**
 
+The SML/NJ, MLton and Poly/ML artifacts were built through their existing
+bootstrap processes and then rebuilt with their own compilers. Rune orchestrated
+those builds through the harness; it did not compile their compiler sources.
+Harness cross-checks compare the same harness tests compiled independently by
+each selected compiler. No Rune-hosted build of these three compiler
+implementations has been completed; see [build compatibility](docs/compiler-compatibility.md).
+
 Paths under `_work/` identify local evidence, not files included in Git. They
 will be absent in a fresh clone. Reruns create new IDs and preserve earlier
 attempts. The instructions below cover both reusing this checkout's compiler

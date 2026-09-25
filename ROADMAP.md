@@ -16,8 +16,14 @@ selected correctness suites and the `corpus-stack-1` benchmark adapter.
 [Implementation notes](docs/implementation.md) record the acceptance evidence.
 Completion includes repeatable failures: the regression profile preserves
 investigated MLton and Poly/ML library differences and returns nonzero. It does
-not imply that all compilers pass every test, that full Rune compiler ports are
-finished, or that other operating systems and arbitrary benchmark formats work.
+not imply that all compilers pass every test or that other operating systems and
+arbitrary benchmark formats work. The reference bootstraps use upstream boot
+files or an installed compiler of the same family, then rebuild with their own
+compilers. Rune runs the harness that drives these builds. Building SML/NJ,
+MLton or Poly/ML's compiler sources with Rune remains unimplemented; no full or
+reduced-feature Rune-hosted build of those compilers is part of the completed
+work. See [build compatibility](docs/compiler-compatibility.md) for the assessed
+porting requirements.
 Milestones below retain their original completion criteria and dependency order.
 
 ## Extension: versioned Rune compilers

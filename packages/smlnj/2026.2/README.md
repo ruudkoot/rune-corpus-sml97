@@ -1,5 +1,9 @@
 # SML/NJ 2026.2
 
+**These recipes bootstrap from SML/NJ's upstream boot files and rebuild with
+SML/NJ.** Rune runs the corpus harness that orchestrates the build. There is no
+implemented Rune-hosted SML/NJ build, including a reduced-feature one.
+
 Pinned on 2026-09-23 to the latest official release, **2026.2**, from the
 development channel. The older stable channel is 110.99.9. This choice follows
 the roadmap's latest-release policy; it does not imply production stability.
@@ -53,7 +57,7 @@ the harness cross-check have passed. Recommended broader suites are the upstream
 compiler regression tests and SML/NJ library tests, followed by the full compiler
 self-build as a larger workload. Recorded costs are in the compatibility notes.
 
-Building SML/NJ directly with Rune is not claimed. Its compiler uses CM, compiler
+Compiling SML/NJ's sources with Rune needs a port. Its compiler uses CM, compiler
 internals, generated boot files and a dedicated native runtime. A source-level
 compatibility assessment is recorded in the compatibility notes below.
 

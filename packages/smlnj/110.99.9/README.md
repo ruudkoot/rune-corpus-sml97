@@ -1,5 +1,9 @@
 # SML/NJ legacy 110.99.9
 
+**These recipes bootstrap from SML/NJ's upstream boot files and rebuild with
+SML/NJ.** Rune runs the corpus harness that orchestrates the build. There is no
+implemented Rune-hosted SML/NJ build, including a reduced-feature one.
+
 This is the latest official **legacy** release, verified on 2026-09-23. It is
 included alongside development version 2026.2 at the user's request. Both use
 family `smlnj`, with distinct version, recipe, installation and result identities.
@@ -36,9 +40,10 @@ They accept an optional variant. `stage1.record` invokes upstream
 This produces a bootstrap artifact only. Stage 2, downstream validation,
 reference harness cross-checks and coexistence with 2026.2 have passed.
 
-Building this compiler with Rune is not claimed. Its CM bootstrap machinery,
-MLRISC code generator and dedicated runtime require an explicit compatibility
-assessment, recorded in the compatibility notes below. Recommended larger checks are the upstream compiler regressions,
+Compiling this compiler's sources with Rune needs a port. Its CM bootstrap
+machinery, MLRISC integration and dedicated runtime need adaptation; the source
+assessment is recorded in the compatibility notes below.
+Recommended larger checks are the upstream compiler regressions,
 SML/NJ library tests and compiler self-build. Measured costs and Rune blockers
 are recorded in those notes.
 

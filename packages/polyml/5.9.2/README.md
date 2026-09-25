@@ -1,5 +1,9 @@
 # Poly/ML 5.9.2
 
+**These recipes bootstrap from Poly/ML's upstream image and rebuild with
+Poly/ML.** Rune runs the corpus harness that orchestrates the build. There is no
+implemented Rune-hosted Poly/ML build, including a reduced-feature one.
+
 Pinned to the latest official release checked on 2026-09-23. The
 [release](https://github.com/polyml/polyml/releases/tag/v5.9.2) and
 [installation instructions](https://www.polyml.org/download.html) describe the
@@ -32,7 +36,7 @@ upstream verdicts, subject to the runner's applicability behavior above; the
 harness cross-check and shared 113 semantic assertions have also passed.
 Exact evidence is recorded in [implementation notes](../../../docs/implementation.md).
 
-There are no source patches. Direct compilation with Rune is unsupported:
+There are no source patches. Compiling Poly/ML's sources with Rune needs a port:
 Poly/ML's compiler and Basis depend on its compiler namespace, runtime calls,
 export mechanism and platform backends. The
 [compatibility assessment](../../../docs/compiler-compatibility.md) identifies

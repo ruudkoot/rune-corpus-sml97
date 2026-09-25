@@ -1,21 +1,40 @@
 # Compiler build compatibility
 
+**The corpus can build SML/NJ, MLton and Poly/ML, but none of their compiler
+implementations is currently built with Rune.** Rune runs the harness that
+invokes their existing bootstrap processes. Rune also compiles the harness,
+both pinned Rune compiler versions, HaMLet and selected portable test programs.
+
+In this document, a **Rune-hosted compiler build** means Rune compiles the other
+compiler's SML sources. That route is unimplemented for all three reference
+implementations. There is no working reduced-feature Rune-hosted build of them
+either. The dependencies listed below are porting requirements identified from
+the pinned sources, not features switched off in an otherwise working build.
+This assessment does not establish that such ports are impossible.
+
 The tested host is native x86-64 Linux. Corpus-managed SML/NJ 2026.2 and legacy
 110.99.9 coexist, each with its own sources, installation, manifest and bootstrap
 parent. The stage-2 recipes accept only the matching compiler family, version and
 target. System SML compilers are excluded from their child PATHs.
 
-| Package | Implemented route | Direct build with Rune |
+| Package | Implemented and validated bootstrap route | Rune-hosted compiler build |
 | --- | --- | --- |
 | Rune commits `b5ec8c8...` and `e840204...` | Installed Rune seed, followed by same-commit self-hosted stage 2 with a fresh matching VM | Supported; both stages, smoke and self-reproduction passed |
-| SML/NJ 2026.2 | Bundled boot files plus GCC/LLVM runtime, followed by corpus self-build | Unsupported: CM/CMB, runtime representation and LLVM code-generation interface |
-| SML/NJ 110.99.9 | Bundled boot files plus GCC runtime, followed by corpus self-build | Unsupported: CM/CMB, MLRISC, continuations and runtime representation |
-| MLton 20241230 | Recorded installed MLton seed for stage 1; corpus compiler for stage 2 | Unsupported pending a Rune source-list/stub adapter and Basis coverage validation |
-| Poly/ML 5.9.2 | Bundled bootstrap image, then corpus compiler with a fresh native runtime | Unsupported: compiler namespace, runtime calls and native export mechanism |
+| SML/NJ 2026.2 | Bundled boot files plus GCC/LLVM runtime, then SML/NJ compiles SML/NJ | Not implemented; needs adaptation of CM/CMB, runtime services and the LLVM code-generation interface |
+| SML/NJ 110.99.9 | Bundled boot files plus GCC runtime, then SML/NJ compiles SML/NJ | Not implemented; needs adaptation of CM/CMB, MLRISC integration, continuations and runtime services |
+| MLton 20241230 | Installed MLton compiles stage 1; that MLton compiles stage 2 | Not implemented; needs a Rune source-list/host-service adapter and Basis coverage validation |
+| Poly/ML 5.9.2 | Bundled bootstrap image, then Poly/ML compiles Poly/ML with a fresh native runtime | Not implemented; needs adaptation of the compiler namespace, runtime calls and native export mechanism |
 
 These describe compiler **builds**. Portable programs from the SML/NJ regression
 repository do compile and run with Rune; that does not establish that Rune can
 build the SML/NJ compiler itself.
+
+The stage-2 recipes enforce these routes: SML/NJ requires a matching SML/NJ
+artifact, MLton a matching MLton artifact, and Poly/ML a matching Poly/ML
+artifact. A Rune artifact is rejected for each. Harness cross-checks compile
+the harness test sources independently with these compilers and compare their
+verdicts with Rune's; they do not compile one compiler with another. Basis-suite
+failures are separate correctness findings about the resulting compilers.
 
 ## SML/NJ assessment
 
@@ -128,14 +147,13 @@ initially found a vector-test range assumption. See the
 MLton's complete subset is deliberately reported as failed; neither its successful
 bootstrap nor its harness cross-check overrides that result.
 
-## Final profile harness cross-checks (2026-09-25)
+## Original acceptance profile harness cross-checks (2026-09-25)
 
-All four reference selections passed the current harness fixtures, including
+All four reference selections passed that acceptance run's harness fixtures, including
 experiment sharing/flag identity and the corrected bounded orphan-timeout check:
 
 | Selection | Cross-check directory under `_work/cross-checks/` |
 | --- | --- |
-| Rune commits `b5ec8c8...` and `e840204...` | Installed Rune seed, followed by same-commit self-hosted stage 2 with a fresh matching VM | Supported; both stages, smoke and self-reproduction passed |
 | SML/NJ 2026.2 | `1790295975519293-BCBFD-1` |
 | SML/NJ 110.99.9 | `1790296068656486-BF17D-1` |
 | MLton 20241230 | `1790296118447098-BFA36-1` |
@@ -144,3 +162,5 @@ experiment sharing/flag identity and the corrected bounded orphan-timeout check:
 These compare ordered fixture verdicts and require the completion marker from
 both Rune and the reference. They are distinct from downstream Basis conformance:
 the expanded Basis suite retains documented MLton and Poly/ML differences.
+Later cross-checks covering both corpus Rune commits and all four reference
+selections are in [versioned Rune results](../RESULTS.md#versioned-rune-results).
