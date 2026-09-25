@@ -28,8 +28,14 @@ The following milestones extend the completed initial roadmap:
   and record the installed bootstrap seed and matching runtime/library bundle.
 - [x] R2: Select corpus Rune artifacts in suites, programs, experiments and
   harness cross-checks; update profile bindings and the manual.
-- [ ] R3: Validate both versions alongside the reference compilers, preserve
+- [x] R3: Validate both versions alongside the reference compilers, preserve
   results and manual reruns, and record any discovered compatibility failures.
+
+All three extension milestones are complete. Both requested Rune commits passed
+bootstrap, self-reproduction, harness cross-checks, shared/expanded suites and
+HaMLet. The independent two-version benchmark matrix and failure-handling checks
+passed acceptance. The reference regression retains the same three failing
+tasks. See [RESULTS.md](RESULTS.md) for exact evidence and current reruns.
 
 Commit after each completed milestone, following `AGENTS.md`.
 
@@ -226,8 +232,9 @@ compiler. If a project needs further stages, model and validate them too.
 
 After bootstrap, remove stage-0 tools from compiler selection and verify normal
 work with those tools unavailable. Native prerequisites remain allowed and
-recorded. The installed Rune is the explicit exception to corpus-managed SML
-compilers. Validate bootstrap outputs with upstream checks and representative
+recorded. Installed Rune remains the harness compiler/runtime and initial Rune
+seed; Rune subjects use corpus artifacts and their own VMs. Validate bootstrap
+outputs with upstream checks and representative
 programs; compare binaries byte-for-byte only where the build supports it.
 
 ## Milestones

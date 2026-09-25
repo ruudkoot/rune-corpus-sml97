@@ -26,7 +26,7 @@ depends on CM/CMB path anchors, stable libraries, primitive bindings and an SML/
 heap image. The development version's `compiler/CodeGen/main/code-gen-fn.sml`
 also invokes its LLVM generation layer, backed by the dedicated native runtime.
 
-Rune's installed compiler consumes SML sources and produces Rune bytecode. The
+Rune consumes SML sources and produces Rune bytecode. The
 SML/NJ runtime representations, heap exporter and code-generation interface
 cannot be provided by changing source ordering alone. A CM-to-source adapter
 would help isolate portable front-end modules but would not supply these runtime

@@ -60,3 +60,8 @@ conformance suite. Fresh Rune and Poly/ML builds both passed all seven checks
 after the smoke correction. Build commands have a 900-second timeout;
 individual tests have 600 seconds. Measured costs and passed attempt identities
 will be recorded in [implementation notes](../../../docs/implementation.md).
+
+Both corpus Rune commits `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` and
+`e840204151663baf1139c8096b566301e9ced37d` passed their selected downstream
+checks on 2026-09-25. See [versioned Rune results](../../../RESULTS.md#versioned-rune-results)
+for the exact artifacts, suite outcomes and manual reruns.

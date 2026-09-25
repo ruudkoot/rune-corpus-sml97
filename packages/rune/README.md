@@ -75,3 +75,8 @@ bin/corpus bench experiments/stackvm/rune-versions.record _work/my-bindings.reco
 The profile covers harness cross-checks, both Basis selections and HaMLet. The
 small benchmark verifies independent generator/runtime version selection. See
 `RESULTS.md` and `docs/implementation.md` for dated acceptance evidence.
+
+Both corpus Rune commits `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` and
+`e840204151663baf1139c8096b566301e9ced37d` passed their selected downstream
+checks on 2026-09-25. See [versioned Rune results](../../RESULTS.md#versioned-rune-results)
+for the exact artifacts, suite outcomes and manual reruns.

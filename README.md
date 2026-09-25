@@ -305,7 +305,7 @@ and run its doctor before starting a long build.
 | --- | --- |
 | `RUNE` | Selects the installed Rune compiler, including in `bin/build` and tests. Use an absolute executable path when overriding it. |
 | `RUNEVM` | Selects the matching installed VM used by the launchers. |
-| `CORPUS_RUNE_LIB` | Overrides the directory inventoried for Rune's Basis and compiler payload; defaults relative to the selected compiler. This setting does not reconfigure Rune's library search. |
+| `CORPUS_RUNE_LIB` | Identifies the installed Rune Basis/payload for inventory and the external Rune seed. Stage-1 Rune builds pass this library explicitly to the seed compiler. It does not change the harness build's library search; identify the library that its compiler actually uses. |
 | Native build settings | Selected values such as `CC`, `CXX`, `CFLAGS`, `LDFLAGS` and `MAKEFLAGS` are inherited and recorded; a recipe's explicit settings can override them. |
 
 Child environments use `LC_ALL=C`, `LANG=C` and `TZ=UTC` and an explicit allowlist
@@ -881,22 +881,23 @@ See [evidence and reruns](docs/evidence.md) for the retention policy.
 ## 5. Current boundaries
 
 The following combines historical acceptance with current adapter support.
-Versioned Rune downstream validation is recorded separately in RESULTS.md.
+Versioned Rune downstream validation and the original acceptance data are
+recorded separately in [RESULTS.md](RESULTS.md).
 Local build progress and exact evidence paths belong in
 [implementation notes](docs/implementation.md); use records for the outcome of
 any particular run.
 
 | Area | Available behavior and remaining work |
 | --- | --- |
-| Rune | Both requested commit versions passed stages 1 and 2, smoke and self-reproduction. Programs, suites, benchmarks and cross-checks accept their explicit stage-2 artifacts and matching VMs. |
+| Rune | Both requested commit versions passed stages 1 and 2, smoke and self-reproduction, 61-verdict harness cross-checks, all 611 expanded Basis verdicts and seven HaMLet checks. Workloads select their explicit artifacts and matching VMs. |
 | SML/NJ | Development 2026.2 and legacy 110.99.9 have passed stage-2 validation, harness cross-checks and the shared 113 assertions. |
 | Poly/ML | 5.9.2 has passed stage-2 validation, the selected upstream runner, the harness cross-check, the shared 113 assertions and the recorded seed-independence audit. |
 | MLton | 20241230 stages 1 and 2, selected upstream regressions and the harness cross-check have passed. The shared subset retains an investigated String.fromCString failure; see [known differences](packages/smlnj-regressions/95b939d/known-differences.md). |
-| HaMLet | 2.0.1 builds with installed Rune and corpus Poly/ML 5.9.2 passed the corrected smoke test and six upstream conformance cases. |
-| Expanded Basis suite | Rune and both SML/NJ versions passed all 611 verdicts; MLton retains the String failure and Poly/ML retains Substring/Word8 differences, with documented reproducers. |
+| HaMLet | 2.0.1 builds with both corpus Rune commits and Poly/ML 5.9.2 passed the corrected smoke test and six upstream conformance cases. |
+| Expanded Basis suite | Both Rune commits and both SML/NJ versions passed all 611 verdicts; MLton retains the String failure and Poly/ML retains Substring/Word8 differences, with documented reproducers. |
 | Owned programs | Build/export adapters exist for all four compiler families. Rune, Poly/ML and modern SML/NJ paths have been exercised with the stack-machine fixture. |
-| Benchmarks | The experimental `bench` command completed eight stack-machine configurations with five measured samples each. Wrong-output, missing-binding and timeout acceptance checks passed, as did a compiler-option binding. Large timing variation prevents a reliable compiler ranking. General workloads and extra flags for Poly/ML/SML/NJ remain unsupported. |
-| Profiles | Quick passed from a clean source-only copy; regression completed 16 tasks with 13 passes and three documented failing tasks; the opt-in long benchmark profile passed. |
+| Benchmarks | The two-Rune acceptance matrix passed eight configurations; its 16 samples rounded to zero and do not measure comparative performance. The earlier main matrix completed eight configurations with five measured samples each. Wrong-output, missing-binding and timeout acceptance checks passed, as did a compiler-option binding. Large timing variation prevents a reliable compiler ranking. General workloads and extra flags for Poly/ML/SML/NJ remain unsupported. |
+| Profiles | The versioned Rune profile passed all eight tasks. Regression with corpus Rune completed 16 tasks with 13 passes and the same three documented reference failures. Quick and long retain their earlier acceptance evidence. |
 
 The validated host is x86-64 Linux. Other targets and complete Rune ports of the
 reference compilers are not implied by the available adapters. See

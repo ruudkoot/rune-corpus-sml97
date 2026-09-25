@@ -381,3 +381,38 @@ VM. Local logs and program IDs are in
 `_work/research/rune-versions/programs.json`. Full profiles and the two-version
 benchmark acceptance matrix are the next milestone. README, RESULTS reruns,
 package manuals, binding examples and CLI help now require explicit subjects.
+
+## R3: versioned Rune acceptance (2026-09-25)
+
+The two-version profile passed all eight tasks at
+`_work/profiles/1790337090162887-29DD52-1` (484.51 seconds). Each requested
+Rune commit matched 61 harness verdicts and passed 113 shared Basis verdicts,
+611 expanded verdicts and seven HaMLet checks. The shared set is nested in
+the expanded set. Both Rune VM selections came from the corresponding compiler
+manifest. The four other reference cross-checks also matched 61 verdicts.
+
+Regression profile `_work/profiles/1790337090174151-29DD67-1` finished in
+745.10 seconds with 13 passes and exactly the original three failing tasks.
+Case-level inspection confirmed only MLton String and Poly/ML Substring/Word8
+failed. Correctness profiles overlapped; their times are not benchmarks.
+
+After those jobs finished, the independent Rune generator/runtime matrix passed
+at `_work/experiments/1790337837874717-2C6807-1`: four fresh program builds,
+eight configurations, 16 measured samples, eight correctness gates and eight
+warmups. All 16 wall samples rounded to 0.00 seconds; this is selection and
+execution acceptance only. The flag-binding case passed at
+`_work/experiments/1790337869457717-2C76FA-1`. Wrong-answer/missing-binding
+and timeout cases were rejected without measured samples at
+`_work/experiments/1790337889415703-2C8391-1` and
+`_work/experiments/1790337903587099-2C85D7-1`.
+
+Selection checks also rejected a VM from another Rune bundle, a bootstrap-only
+compiler used for a workload and the old installed-rune subject selector.
+The downloaded archives' 1,385/1,496 regular source files matched Git archives
+of the two exact commit objects. Raw driver output, source verification and the
+structured summary are retained under `_work/research/rune-versions/`.
+[RESULTS.md](../RESULTS.md) contains every task ID and timing sample, separately
+from the historical acceptance snapshot, plus current manual rerun commands.
+
+Installed Rune remains the harness compiler/runtime and preferred bootstrapper.
+This work made no edits to the main Rune repository.

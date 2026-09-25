@@ -31,7 +31,7 @@ revision. Installed Rune still builds/runs the harness and seeds Rune bootstrap.
 - [Basis correctness results](#basis-correctness-results)
 - [HaMLet application results](#hamlet-application-results)
 - [Benchmark results](#benchmark-results)
-- [Versioned Rune bootstrap results](#versioned-rune-bootstrap-results)
+- [Versioned Rune results](#versioned-rune-results)
 - [How to rerun by hand](#how-to-rerun-by-hand)
 - [What remains to do](#what-remains-to-do)
 
@@ -378,7 +378,7 @@ Additional measured workloads and a quieter, controlled host are needed for
 credible comparative performance conclusions. System identities improve
 traceability; full environmental or byte-identical reproducibility is not claimed.
 
-## Versioned Rune bootstrap results
+## Versioned Rune results
 
 Both requested commits passed the two-stage corpus build, smoke programs and
 stage-2 self-reproduction check. Source versions are the full commits, not their
@@ -391,8 +391,101 @@ recorded and reverified after compilation. Stage 2 has its own freshly built VM.
 | `e840204151663baf1139c8096b566301e9ced37d` | `_work/attempts/1790321998750242-2779D1-1/artifact.record` | `_work/attempts/1790321939806686-276E37-1/artifact.record` |
 
 [The Rune package manual](packages/rune/README.md) explains the different hosting
-and target VMs in stage 1 and provides commands to rebuild both stages. These
-bootstrap results are distinct from downstream suites and benchmark validation.
+and target VMs in stage 1 and provides commands to rebuild both stages. Downloaded regular source files also matched the exact committed Git archives
+(1,385 files for the earlier commit; 1,496 for the newer). The comparison used
+Git objects, independently of edits in the main Rune working tree. These
+bootstrap results are distinct from the downstream validation below.
+
+### Versioned Rune correctness validation
+
+Both commit artifacts passed their cross-check, shared suite, expanded suite and
+HaMLet application checks: **61 ordered harness verdicts, 113 shared verdicts,
+611 expanded verdicts and seven HaMLet checks each**. Shared checks are included
+in the expanded selection; these are not 724 independent Basis checks.
+
+| Rune subject | Harness | Shared Basis | Expanded Basis | HaMLet |
+| --- | --- | --- | --- | --- |
+| `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` | 61/61 matched | 113 passed | 611 passed | 7 passed |
+| `e840204151663baf1139c8096b566301e9ced37d` | 61/61 matched | 113 passed | 611 passed | 7 passed |
+
+All four non-Rune reference selections also matched the updated 61 harness
+verdicts. The regression profile selected the newer Rune artifact and again
+returned nonzero for exactly `mlton-suite`, `mlton-expanded` and `poly-expanded`;
+the other 13 tasks passed. These are the same recorded reference-library cases.
+The two correctness profiles overlapped; their complete task durations include
+tracing and setup and are not comparative performance measurements.
+
+| Profile | Outcome | Whole elapsed time | Evidence directory |
+| --- | --- | --- | --- |
+| Two Rune versions | 8 tasks passed | 484.51 s | `_work/profiles/1790337090162887-29DD52-1` |
+| Reference regression | 13 passed; 3 documented failures | 745.10 s | `_work/profiles/1790337090174151-29DD67-1` |
+
+| Task | Outcome | Evidence directory |
+| --- | --- | --- |
+| new-expanded | passed | `_work/attempts/1790337469829262-2B5D6E-1` |
+| new-hamlet | passed | `_work/attempts/1790337480796289-2B6030-1` |
+| new-harness | passed | `_work/cross-checks/1790337375670861-2ABB2B-1` |
+| new-suite | passed | `_work/attempts/1790337462682237-2B4459-1` |
+| old-expanded | passed | `_work/attempts/1790337165715276-29F457-1` |
+| old-hamlet | passed | `_work/attempts/1790337183045269-29F9CF-1` |
+| old-harness | passed | `_work/cross-checks/1790337091169723-29DE04-1` |
+| old-suite | passed | `_work/attempts/1790337158235663-29F284-1` |
+| hamlet-poly | passed | `_work/attempts/1790337576335527-2BA262-1` |
+| hamlet-rune | passed | `_work/attempts/1790337481008342-2B603C-1` |
+| legacy-expanded | passed | `_work/attempts/1790337673337421-2C0E26-1` |
+| legacy-harness | passed | `_work/cross-checks/1790337157885822-29F26E-1` |
+| legacy-suite | passed | `_work/attempts/1790337413596352-2AD198-1` |
+| mlton-expanded | failed | `_work/attempts/1790337710796577-2C2F30-1` |
+| mlton-harness | passed | `_work/cross-checks/1790337210277092-2A082E-1` |
+| mlton-suite | failed | `_work/attempts/1790337429024152-2AF053-1` |
+| modern-expanded | passed | `_work/attempts/1790337634340091-2BC564-1` |
+| modern-harness | passed | `_work/cross-checks/1790337096827013-29DF07-1` |
+| modern-suite | passed | `_work/attempts/1790337392863043-2AC79C-1` |
+| poly-expanded | failed | `_work/attempts/1790337828898141-2C666C-1` |
+| poly-harness | passed | `_work/cross-checks/1790337310953686-2A9646-1` |
+| poly-suite | passed | `_work/attempts/1790337476898301-2B5EEA-1` |
+| rune-expanded | passed | `_work/attempts/1790337623293242-2BC30B-1` |
+| rune-suite | passed | `_work/attempts/1790337091190900-29DE06-1` |
+
+### Independent Rune generator/runtime acceptance
+
+The small `rune-versions.record` matrix passed all eight combinations: both Rune
+commits independently build the generator and interpreter, for sizes 3 and 9,
+ten iterations, one warmup and two samples per configuration. Four fresh program
+builds produce **16 measured samples, eight correctness gates and eight warmups**.
+Each Rune program runs on its selected artifact's VM. The portable stack format,
+not Rune compiler bytecode, crosses versions. Outputs are 140 and 2850.
+
+These intentionally tiny runs validate selection and execution, not speed.
+Individual wall samples (seconds) are retained below for completeness. All 16
+rounded to `0.00` at the timer's resolution; this does not mean execution costs
+zero time. No compiler ranking is inferred.
+
+| Generator | Interpreter | N | Two wall samples (s) | Median (s) |
+| --- | --- | --- | --- | --- |
+| rune-new | rune-new | 3 | 0.00, 0.00 | 0.000 |
+| rune-new | rune-new | 9 | 0.00, 0.00 | 0.000 |
+| rune-new | rune-old | 3 | 0.00, 0.00 | 0.000 |
+| rune-new | rune-old | 9 | 0.00, 0.00 | 0.000 |
+| rune-old | rune-new | 3 | 0.00, 0.00 | 0.000 |
+| rune-old | rune-new | 9 | 0.00, 0.00 | 0.000 |
+| rune-old | rune-old | 3 | 0.00, 0.00 | 0.000 |
+| rune-old | rune-old | 9 | 0.00, 0.00 | 0.000 |
+
+| Acceptance check | Recorded outcome | Experiment directory |
+| --- | --- | --- |
+| Two Rune versions | passed; 16 measured samples | `_work/experiments/1790337837874717-2C6807-1` |
+| Corpus Rune `--basis all` binding | passed; 2 measured samples | `_work/experiments/1790337869457717-2C76FA-1` |
+| Wrong answer and missing binding | invalid; 0 measured samples | `_work/experiments/1790337889415703-2C8391-1` |
+| Runtime deadline | invalid; 0 measured samples | `_work/experiments/1790337903587099-2C85D7-1` |
+
+The invalid cases returned status 1 and produced no measured samples. Separate
+selection checks rejected an outside VM substituted into a Rune artifact,
+a stage-1 artifact used as a workload compiler, and the legacy `installed-rune`
+workload selector. The retained diagnostics are under
+`_work/research/rune-versions/selection-checks.json`. Both real versions also
+passed the reduced String program, using their own recorded VMs; program IDs and
+outputs are in `_work/research/rune-versions/programs.json`.
 
 ## How to rerun by hand
 
@@ -417,8 +510,9 @@ bin/corpus --help
 
 When selecting another installed Rune, set absolute `RUNE` and matching `RUNEVM`
 paths before building. Set `CORPUS_RUNE_LIB` if the default inventory location
-is inappropriate; this variable identifies the actual Basis/payload for records,
-and does not change the compiler's library search. Rebuild after replacing Rune.
+is inappropriate; this variable identifies the actual Basis/payload for records
+and is passed as the explicit seed library during Rune stage 1. It does not
+change the harness build's library search. Rebuild after replacing Rune.
 `bin/build` regenerates `corpus.mlb` for the LSP.
 
 For the self-contained harness checks:

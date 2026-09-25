@@ -42,7 +42,8 @@ Use `smlnj.record` or `mlton.record` for the other reference families. `fetch`,
 `patch` and `build` retain their normal lifecycle meanings; the build phase
 registers the prepared suite inputs and compilation happens per case during
 `test`. Prerequisites are the normal Linux acquisition, tracing and patch tools,
-installed Rune/VM, and the selected reference artifact where applicable.
+installed harness Rune/VM, and the selected corpus compiler artifact (including
+its matching VM for a Rune subject).
 Each attempt has fresh source/build directories and per-case logs and generated
 reproducers under `build/suites/`. The quick and expanded selections share only
 the verified archive cache and unchanged oracle inputs, not mutable work trees.
@@ -108,3 +109,8 @@ Initial traced whole-attempt costs on the development WSL2 host were about
 45 seconds for Rune, 57 seconds for modern SML/NJ, 31 seconds for legacy SML/NJ,
 192 seconds for MLton and 22 seconds for Poly/ML. Other validation was active
 for some runs; these are planning estimates, not performance comparisons.
+
+Both corpus Rune commits `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` and
+`e840204151663baf1139c8096b566301e9ced37d` passed their selected downstream
+checks on 2026-09-25. See [versioned Rune results](../../../../../../RESULTS.md#versioned-rune-results)
+for the exact artifacts, suite outcomes and manual reruns.

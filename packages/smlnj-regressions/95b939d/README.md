@@ -55,3 +55,8 @@ The separate [expanded Basis suite](suites/basis-expanded/1/README.md) retains
 this quick selection and adds arrays, slices, scanning, substrings and byte
 arithmetic: 611 verdicts from ten upstream files. It has its own recipes and
 isolated attempts, so it can coexist with the 113-verdict selection.
+
+Both corpus Rune commits `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` and
+`e840204151663baf1139c8096b566301e9ced37d` passed their selected downstream
+checks on 2026-09-25. See [versioned Rune results](../../../RESULTS.md#versioned-rune-results)
+for the exact artifacts, suite outcomes and manual reruns.
