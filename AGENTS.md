@@ -1,5 +1,16 @@
 # Repository instructions
 
+## Commit after each milestone
+
+Commit after each completed milestone, once its relevant checks and documentation
+updates are complete, before starting the next milestone. Keep each commit focused
+on that milestone.
+
+Follow the initial commit's message style: an imperative one-line summary, a
+concise explanation of the changes, relevant validation results and limitations,
+and a `Co-Authored-By` trailer naming the contributing model. For GPT-6 Astra, use
+`Co-Authored-By: GPT-6 Astra <noreply@openai.com>`.
+
 ## Keep the user manual current
 
 `README.md` is both the GitHub landing page and the user manual for the
