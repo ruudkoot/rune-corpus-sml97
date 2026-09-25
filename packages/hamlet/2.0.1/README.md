@@ -14,16 +14,18 @@ was found. See upstream `LICENSE.txt` and the bundled library's license.
 ## Build paths
 
 `polyml.record` uses upstream `make with-poly` with an exact corpus-built Poly/ML
-5.9.2. `rune.record` uses upstream `make hamlet-bundle.sml`, then installed Rune
+5.9.2. `rune.record` uses upstream `make hamlet-bundle.sml`, then the selected corpus Rune compiler
 compiles that bundle. Both preserve the upstream paths without source patches.
 Make is explicitly given Bash because upstream commands use Bash-compatible
 condition syntax. Native tools, command environments and file traces are recorded.
 The generated parsers are supplied by the pinned archive; no system SML seed
 or unpinned generator is selected.
 
+Set `corpus_rune` to the absolute path of a validated Rune stage-2 artifact.
+
 ```sh
 bin/corpus doctor packages/hamlet/2.0.1/rune.record amd64-linux
-bin/corpus test packages/hamlet/2.0.1/rune.record amd64-linux
+bin/corpus test packages/hamlet/2.0.1/rune.record amd64-linux "$corpus_rune"
 bin/corpus test packages/hamlet/2.0.1/polyml.record amd64-linux PATH/TO/STAGE2/artifact.record
 ```
 

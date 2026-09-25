@@ -2,7 +2,9 @@ corpus-record-v1
 artifact	{source}/LICENSE
 artifact.kind	suite-inputs
 build.count	0
-compiler.kind	installed-rune
+compiler.kind	corpus
+compiler.families.count	1
+compiler.families.0	rune
 environment.isolated	true
 inputs.0	{root}/packages/smlnj-regressions/95b939d/suite.record
 inputs.1	{root}/packages/smlnj-regressions/95b939d/list-oracle.sml
@@ -23,7 +25,7 @@ test.0.args.1	run-suite
 test.0.args.2	{root}/packages/smlnj-regressions/95b939d/suite.record
 test.0.args.3	{source}
 test.0.args.4	{build}
-test.0.args.5	installed-rune
+test.0.args.5	{compiler.record}
 test.0.args.count	6
 test.0.cwd	{root}
 test.0.program	{runevm}

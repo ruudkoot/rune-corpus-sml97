@@ -79,13 +79,11 @@ struct
       val sources = List.map source ["generator", "runtime"]
       fun compiler alias =
         (let val input = Record.require selected (alias ^ ".compiler")
-            val path = if input = "installed-rune" then input else
-              OS.Path.mkAbsolute {path = input, relativeTo = OS.Path.dir bindings}
+            val () = if input = "installed-rune" then raise Fail
+              "benchmark bindings require a corpus Rune artifact, not installed-rune" else ()
+            val path = OS.Path.mkAbsolute {path = input, relativeTo = OS.Path.dir bindings}
             fun resolve () =
-              let val record = if path = "installed-rune" then
-                    [("kind", "installed-rune"), ("family", "rune"),
-                     ("system.sha256", systemHash)]
-                    else Artifact.compiler {steps = steps, path = path, allowBootstrap = false}
+              let val record = Artifact.compiler {steps = steps, path = path, allowBootstrap = false}
                   val family = Record.require record "family"
                   val arguments = if Option.isSome (Record.find selected (alias ^ ".arguments.count"))
                     then Record.getStrings selected (alias ^ ".arguments") else []

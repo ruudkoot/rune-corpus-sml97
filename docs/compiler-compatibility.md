@@ -7,6 +7,7 @@ target. System SML compilers are excluded from their child PATHs.
 
 | Package | Implemented route | Direct build with Rune |
 | --- | --- | --- |
+| Rune commits `b5ec8c8...` and `e840204...` | Installed Rune seed, followed by same-commit self-hosted stage 2 with a fresh matching VM | Supported; both stages, smoke and self-reproduction passed |
 | SML/NJ 2026.2 | Bundled boot files plus GCC/LLVM runtime, followed by corpus self-build | Unsupported: CM/CMB, runtime representation and LLVM code-generation interface |
 | SML/NJ 110.99.9 | Bundled boot files plus GCC runtime, followed by corpus self-build | Unsupported: CM/CMB, MLRISC, continuations and runtime representation |
 | MLton 20241230 | Recorded installed MLton seed for stage 1; corpus compiler for stage 2 | Unsupported pending a Rune source-list/stub adapter and Basis coverage validation |
@@ -134,6 +135,7 @@ experiment sharing/flag identity and the corrected bounded orphan-timeout check:
 
 | Selection | Cross-check directory under `_work/cross-checks/` |
 | --- | --- |
+| Rune commits `b5ec8c8...` and `e840204...` | Installed Rune seed, followed by same-commit self-hosted stage 2 with a fresh matching VM | Supported; both stages, smoke and self-reproduction passed |
 | SML/NJ 2026.2 | `1790295975519293-BCBFD-1` |
 | SML/NJ 110.99.9 | `1790296068656486-BF17D-1` |
 | MLton 20241230 | `1790296118447098-BFA36-1` |

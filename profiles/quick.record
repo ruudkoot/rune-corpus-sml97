@@ -9,3 +9,4 @@ portable.variant	amd64-linux
 tasks.0	harness
 tasks.1	portable
 tasks.count	2
+portable.compiler	rune

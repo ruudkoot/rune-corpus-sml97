@@ -11,7 +11,7 @@ struct
      ("good.source", "input.sml"), ("good.validator", "good.sml")] @
     Record.strings "cases" ["bad", "good"])
   val failed = ((Suite.run {metadata = metadata, source = work, build = work,
-                            compilerArtifact = "installed-rune"}; false) handle Fail _ => true)
+                            compilerArtifact = TestCompiler.first}; false) handle Fail _ => true)
   val () = CoreTests.assert ("semantic suite rejects failed oracle", failed)
   val directory = work ^ "/suites/" ^ hd (Files.entries (work ^ "/suites"))
   val () = CoreTests.assert ("semantic suite preserves failed case",

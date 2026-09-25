@@ -1,5 +1,7 @@
 corpus-record-v1
 kind	compiler-bindings
 poly.compiler	/REPLACE_WITH_ABSOLUTE_POLYML_STAGE2_ATTEMPT/artifact.record
-rune.compiler	installed-rune
+rune.compiler	/absolute/path/to/RUNE_STAGE2/artifact.record
 smlnj.compiler	/REPLACE_WITH_ABSOLUTE_SMLNJ_STAGE2_ATTEMPT/artifact.record
+rune-old.compiler	/absolute/path/to/RUNE_B5_STAGE2/artifact.record
+rune-new.compiler	/absolute/path/to/RUNE_E8_STAGE2/artifact.record

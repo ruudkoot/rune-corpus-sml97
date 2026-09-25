@@ -62,5 +62,16 @@ the external harness/seed installation as documented in the main manual; they
 do not identify a corpus Rune version.
 
 Both commits have passed stages 1 and 2, including smoke and self-reproduction
-checks. Workload adapters and profile bindings are being migrated to these artifacts in
-the next milestone. Build-stage evidence is in `docs/implementation.md`.
+checks. Use a passed stage-2 artifact with `cross-check`, `program`, the Rune suite and
+HaMLet recipes, or compiler bindings. These adapters select the artifact's VM;
+they never run its bytecode on the installed harness VM. For both versions,
+fill `rune-old` and `rune-new` in `profiles/bindings.example.record`, then run:
+
+```sh
+bin/corpus profile profiles/rune-versions.record _work/my-bindings.record
+bin/corpus bench experiments/stackvm/rune-versions.record _work/my-bindings.record
+```
+
+The profile covers harness cross-checks, both Basis selections and HaMLet. The
+small benchmark verifies independent generator/runtime version selection. See
+`RESULTS.md` and `docs/implementation.md` for dated acceptance evidence.

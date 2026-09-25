@@ -24,15 +24,17 @@ and source attribution remain in the acquired tree; no upstream source copy is
 committed here. Revision 1 identifies this suite selection and its validators,
 not a new upstream release.
 
-Use installed Rune or an exact validated corpus compiler: SML/NJ 2026.2 or
+Use an exact validated corpus compiler, including a Rune commit artifact: SML/NJ 2026.2 or
 110.99.9, MLton 20241230, or Poly/ML 5.9.2. The initial platform is x86-64 Linux.
 Reference support means the adapter runs the checks and records their verdicts;
 it does not imply that every compiler passes them. Validation results and
 investigated differences are recorded below as they become available.
 
+Set `corpus_rune` to the absolute path of a validated Rune stage-2 artifact.
+
 ```sh
 bin/corpus doctor packages/smlnj-regressions/95b939d/suites/basis-expanded/1/rune.record amd64-linux
-bin/corpus test packages/smlnj-regressions/95b939d/suites/basis-expanded/1/rune.record amd64-linux
+bin/corpus test packages/smlnj-regressions/95b939d/suites/basis-expanded/1/rune.record amd64-linux "$corpus_rune"
 bin/corpus test packages/smlnj-regressions/95b939d/suites/basis-expanded/1/polyml.record amd64-linux PATH/TO/STAGE2/artifact.record
 ```
 

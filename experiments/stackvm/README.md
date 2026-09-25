@@ -9,8 +9,8 @@ The generator and interpreter expose the same portable `Program.main` interface
 and can be built by independent compiler selections. The mathematical oracle is
 N × (N+1) × (2N+1) / 6, multiplied by the requested workload repetitions.
 
-The fixture is intentionally separate from Rune's bytecode format. This corpus
-uses the installed Rune and does not build or manage Rune runtime versions.
+The fixture is intentionally separate from Rune's bytecode format. Each corpus Rune compiler artifact carries its matching VM. Installed Rune
+builds/runs the harness and supplies the initial bootstrap seed.
 Different SML compilers produce incompatible native/heap formats; the shared
 stack-machine format makes independent generator/runtime choices meaningful.
 The benchmark planner must reject incompatible formats, record both builders,
@@ -19,8 +19,8 @@ check correctness before timing, and retain every individual sample.
 The experimental `bench` adapter now implements planning and measurement for
 this format. `demo.record` selects two generator builders, two interpreter
 builders and two sizes, with one warmup and five samples per valid configuration.
-Copy `bindings.example.record` locally and replace the two reference artifact
-paths with validated stage-2 artifacts; keep Rune as `installed-rune`.
+Copy `bindings.example.record` locally and replace all required artifact
+paths, including Rune, with validated stage-2 artifacts.
 
 ```sh
 bin/corpus bench --dry-run experiments/stackvm/demo.record _work/my-bindings.record
@@ -53,3 +53,19 @@ within some configurations; they do not support a reliable compiler ranking.
 Wrong-output and timeout fixtures were rejected before measured samples, and
 a missing binding remained explicitly unsupported. Exact evidence and recorded
 whole-profile costs are in the implementation notes.
+
+## Independent Rune versions
+
+`rune-versions.record` selects `rune-old` and `rune-new` independently as both
+generator and interpreter builders. Bind them to the requested `b5ec8c8...` and
+`e840204...` stage-2 artifacts. Two sizes (3 and 9), ten iterations, one warmup
+and two samples make this an acceptance check, not a performance study:
+
+```sh
+bin/corpus bench experiments/stackvm/rune-versions.record _work/my-bindings.record
+```
+
+Each owned program is compiled and executed with its selected compiler's VM.
+Only the portable `corpus-stack-1` instruction stream crosses versions; Rune
+compiler bytecode itself does not cross VM installations. The original timing
+results above predate corpus Rune selection and are retained as historical data.

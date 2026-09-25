@@ -86,3 +86,6 @@ tasks.7	mlton-suite
 tasks.8	poly-suite
 tasks.9	hamlet-rune
 tasks.count	16
+rune-suite.compiler	rune
+rune-expanded.compiler	rune
+hamlet-rune.compiler	rune

@@ -365,3 +365,19 @@ The harness passed 59 fixture verdicts, including selection of a VM from
 its Rune artifact and rejection of an outside runtime. The current workload
 adapters still need migration to the new artifacts (R2); these bootstrap
 results do not yet claim downstream or full upstream-suite validation.
+
+## R2: explicit Rune workload selections (2026-09-25)
+
+Workload programs, suites and benchmark bindings now require a corpus compiler
+artifact for Rune. Each subject uses its own manifest-verified runtime rather
+than the installed harness VM. Cross-checks accept Rune artifacts too. The
+installed compiler/VM remain the harness builder/runner and preferred stage-1
+seed. The harness passed 61 fixtures, including distinct identities for two
+Rune versions and rejection of unversioned benchmark selection.
+
+The reduced String program was compiled and executed successfully with each
+real Rune stage-2 artifact. Its recorded runtime equals the selected artifact's
+VM. Local logs and program IDs are in
+`_work/research/rune-versions/programs.json`. Full profiles and the two-version
+benchmark acceptance matrix are the next milestone. README, RESULTS reruns,
+package manuals, binding examples and CLI help now require explicit subjects.

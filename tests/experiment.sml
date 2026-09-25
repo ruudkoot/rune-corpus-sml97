@@ -11,28 +11,34 @@ struct
   val settings = [("kind", "stackvm-experiment"), ("format", "corpus-stack-1"),
     ("generator.source", generator), ("runtime.source", runtime), ("iterations", "1"),
     ("warmups", "0"), ("samples", "1"), ("timeout.seconds", "5"), ("memory.mib", "64")] @
-    Record.strings "generators" ["rune", "same", "all", "missing"] @
+    Record.strings "generators" ["rune", "same", "all", "version2", "missing", "unversioned"] @
     Record.strings "runtimes" ["rune"] @ Record.strings "sizes" ["1", "2"]
   val () = Files.record (specification, settings)
   val () = Files.record (bindings, [("kind", "compiler-bindings"),
-    ("rune.compiler", "installed-rune"), ("same.compiler", "installed-rune"),
-    ("all.compiler", "installed-rune")] @ Record.strings "all.arguments" ["--basis", "all"])
+    ("rune.compiler", TestCompiler.first), ("same.compiler", TestCompiler.first),
+    ("all.compiler", TestCompiler.first), ("version2.compiler", TestCompiler.second),
+    ("unversioned.compiler", "installed-rune")] @ Record.strings "all.arguments" ["--basis", "all"])
   val first = Experiment.plan {root = root, specification = specification, bindings = bindings}
   val configurations = #configurations first
   fun configuration (plan : Experiment.plan) name = valOf (List.find (fn r =>
     Record.require r "generator" = name andalso Record.require r "size" = "1") (#configurations plan))
   val () = CoreTests.assert ("experiment retains incompatible selections",
-    length configurations = 8 andalso length (List.filter
-      (fn r => Record.require r "status" = "unsupported") configurations) = 2)
+    length configurations = 12 andalso length (List.filter
+      (fn r => Record.require r "status" = "unsupported") configurations) = 4)
   val () = CoreTests.assert ("experiment shares identical builder inputs",
     Record.require (configuration first "rune") "generator.build" =
     Record.require (configuration first "same") "generator.build")
   val () = CoreTests.assert ("compiler flags distinguish build identities",
     Record.require (configuration first "rune") "generator.build" <>
     Record.require (configuration first "all") "generator.build")
+  val () = CoreTests.assert ("Rune commit versions distinguish builder identities",
+    Record.require (configuration first "rune") "generator.build" <>
+    Record.require (configuration first "version2") "generator.build")
+  val () = CoreTests.assert ("unversioned Rune benchmark selection rejected",
+    Record.require (configuration first "unversioned") "status" = "unsupported")
   val builds = List.filter (fn ({fields, ...} : Graph.node) =>
     Record.find fields "kind" = SOME "program-build") (#nodes first)
-  val () = CoreTests.assert ("matrix reuses shared builds across workload sizes", length builds = 3)
+  val () = CoreTests.assert ("matrix reuses shared builds across workload sizes", length builds = 4)
   val () = Files.write (generator, Files.read generator ^ "\n(* changed source identity *)\n")
   val second = Experiment.plan {root = root, specification = specification, bindings = bindings}
   val () = CoreTests.assert ("changed source invalidates planned builds",

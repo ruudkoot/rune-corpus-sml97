@@ -15,7 +15,8 @@ promised; known gaps remain visible in the records.
 
 Rune bootstrap recipes now cover `b5ec8c8833e906cd3fe636a49e20b7c8474596dc`
 and `e840204151663baf1139c8096b566301e9ced37d`; see [Rune builds](packages/rune/README.md).
-Migration of workload selections to those artifacts is the next milestone.
+Workloads select exact Rune artifacts; the installed harness compiler is independent
+of those selections.
 
 ## Quick start
 
@@ -188,9 +189,12 @@ or harness cross-check compilers. A successful `build` attempt alone also does
 not qualify a compiler: its producing invocation must be a passed `test`.
 
 Native tools such as GCC remain system dependencies at every stage. Installed
-Rune is the explicit exception to corpus-managed SML compiler selection. This
-repository uses one Rune installation per invocation; it does not download or
-manage Rune versions.
+Rune builds and runs the harness and supplies the preferred external Rune seed.
+Rune workloads instead select a corpus stage-2 artifact by full source commit
+hash. Its compiler, matching VM and Basis are verified together. Two commits
+can therefore coexist even when both print the same upstream release banner.
+Stage 1 runs its compiler on a copied seed VM; stage 2 uses the selected commit's
+freshly built VM. See [Rune bootstrap details](packages/rune/README.md).
 
 ### Correctness suites and oracles
 
@@ -320,7 +324,7 @@ Do not rely on an arbitrary interactive-shell variable reaching a build.
 | `bin/corpus test RECIPE VARIANT [COMPILER_ARTIFACT]` | Also executes the recipe's tests against that new build. |
 
 Recipes with `compiler.kind=corpus` require the exact compiler-artifact argument,
-including for `fetch` and `patch`. Recipes selecting installed Rune, an external
+including for `fetch` and `patch`. Recipes selecting the harness Rune fixture, an external
 bootstrap seed or native boot files do not accept that argument. Recipe doctor
 has no compiler-artifact argument and does not validate the selected compiler
 or prove that all development headers and libraries are present. Those checks
@@ -371,7 +375,7 @@ An earlier compilation/execution failure can leave only partial step evidence.
 ### Owned program builds and execution
 
 ```text
-bin/corpus program SOURCE.sml COMPILER_ARTIFACT_OR_installed-rune
+bin/corpus program SOURCE.sml COMPILER_ARTIFACT
 bin/corpus execute PROGRAM_ARTIFACT [ARG ...]
 ```
 
@@ -385,7 +389,9 @@ struct
 end
 ```
 
-Use the literal `installed-rune` or an exact validated stage-2 artifact path.
+Use an exact validated stage-2 artifact path, including for Rune. The old
+`installed-rune` workload selector is rejected; rebuild historical programs with
+a selected corpus Rune artifact. Existing evidence remains readable.
 The adapter supplies the entry point and compilation/export convention for Rune,
 MLton, Poly/ML or SML/NJ. It snapshots the input, creates a fresh build under
 `_work/programs/`, and prints `program artifact: PATH`. This is a small owned
@@ -441,7 +447,7 @@ artifacts; a binding can additionally supply an `ALIAS.arguments` list for
 compiling the owned program. Extra arguments are supported for Rune and MLton;
 nonempty lists for Poly/ML or SML/NJ are explicitly unsupported.
 
-For example, two aliases can point to `installed-rune`, with one declaring
+For example, two aliases can point to the same Rune artifact, with one declaring
 `arguments.0=--basis`, `arguments.1=all`, and `arguments.count=2` under its alias
 prefix. Put both aliases in the generator list to compare the flag choices.
 The actual record separator is a tab, as in the binding examples. Arguments
@@ -490,11 +496,15 @@ results also record the orchestrator bytecode digest.
 
 | Profile | Intended use and prerequisites |
 | --- | --- |
-| `profiles/quick.record` | Rune harness fixtures and the shared Rune correctness subset. Uses installed Rune and native tools; no reference artifacts required. |
-| `profiles/regression.record` | Shared and expanded Basis suites, all four reference-artifact cross-checks including legacy SML/NJ, and Rune/Poly/ML HaMLet builds. Requires `smlnj`, `legacy`, `mlton` and `poly` bindings. |
+| `profiles/quick.record` | Rune harness fixtures and the shared Rune correctness subset. Requires the `rune` binding to a corpus Rune artifact, plus installed Rune for the harness. |
+| `profiles/regression.record` | Shared and expanded Basis suites, all four reference-artifact cross-checks including legacy SML/NJ, and Rune/Poly/ML HaMLet builds. Requires `rune`, `smlnj`, `legacy`, `mlton` and `poly` bindings. |
+| `profiles/rune-versions.record` | Cross-check, shared/expanded suites and HaMLet for each of `rune-old` and `rune-new`; eight independent tasks. |
 | `profiles/long.record` | Opt-in benchmark matrix; requires the demo's `rune`, `poly` and `smlnj` bindings and no competing corpus builds. |
 
-All three profiles have completed integrated validation. The quick profile
+The original three profiles completed integrated validation before versioned Rune
+selection was introduced. Those historical runs used installed Rune for workloads;
+the current profiles require corpus Rune artifacts. See [RESULTS.md](RESULTS.md)
+for the separately recorded versioned-Rune results. The quick profile
 passed from a clean source-only checkout, and the long profile passed its
 eight-configuration matrix. The regression profile completed all 16 tasks, with
 13 passes and three failing tasks. It retains the investigated MLton String.fromCString failure in both
@@ -514,7 +524,7 @@ profile records keep start/end times and individual task logs.
 Recipes for semantic suites call:
 
 ```text
-bin/corpus run-suite METADATA SOURCE_DIRECTORY BUILD_DIRECTORY COMPILER_ARTIFACT_OR_installed-rune
+bin/corpus run-suite METADATA SOURCE_DIRECTORY BUILD_DIRECTORY COMPILER_ARTIFACT
 ```
 
 This is an internal adapter for already prepared source and build directories.
@@ -534,16 +544,12 @@ current CLI. Named profiles still require explicit reference artifact bindings.
 
 ### Run a standard profile
 
-After `bin/build`, a clean checkout with installed Rune and native prerequisites
-can run the quick profile:
-
-```sh
-bin/corpus profile profiles/quick.record
-```
-
-For reference comparisons, first bootstrap the compilers as described below.
-Copy the binding example and replace its placeholder paths with absolute paths
-to the four validated stage-2 artifact records:
+After `bin/build`, `bin/test` checks the harness without corpus compiler artifacts.
+For the quick profile, bootstrap one Rune commit first; broader profiles also need
+their reference compilers. Copy the binding example and replace the required
+placeholders with absolute paths to validated stage-2 artifacts. `rune` selects
+the Rune subject for quick/regression/long; `rune-old` and `rune-new` select the
+two subjects for the version-comparison profile:
 
 ```sh
 cp profiles/bindings.example.record _work/my-profile-bindings.record
@@ -552,7 +558,9 @@ cp profiles/bindings.example.record _work/my-profile-bindings.record
 After editing those values, run the broader checks or explicitly opt into timing:
 
 ```sh
+bin/corpus profile profiles/quick.record _work/my-profile-bindings.record
 bin/corpus profile profiles/regression.record _work/my-profile-bindings.record
+bin/corpus profile profiles/rune-versions.record _work/my-profile-bindings.record
 bin/corpus profile profiles/long.record _work/my-profile-bindings.record
 ```
 
@@ -577,11 +585,13 @@ are part of the evidence and rerun requirements.
 
 ### Get a first correctness result
 
-After setup, run the portable subset with installed Rune:
+After [bootstrapping Rune](packages/rune/README.md), select its stage-2 artifact
+and run the portable subset:
 
 ```sh
+corpus_rune="$PWD/_work/attempts/REPLACE_WITH_RUNE_STAGE2_ID/artifact.record"
 bin/corpus doctor packages/smlnj-regressions/95b939d/rune.record amd64-linux
-bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux
+bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux "$corpus_rune"
 bin/corpus report
 ```
 
@@ -700,11 +710,11 @@ Windows would require a separate process adapter and validation.
 
 The [stack-machine fixture](experiments/stackvm/README.md) demonstrates two
 independent builders. Rune can build its bytecode generator while a validated
-Poly/ML builds its interpreter. Set `corpus_poly` to its stage-2 artifact as in
-the bootstrap workflow, then run:
+Poly/ML builds its interpreter. Set `corpus_rune` and `corpus_poly` to their
+validated stage-2 artifacts as in the bootstrap workflows, then run:
 
 ```sh
-bin/corpus program experiments/stackvm/codegen.sml installed-rune
+bin/corpus program experiments/stackvm/codegen.sml "$corpus_rune"
 bin/corpus program experiments/stackvm/runtime.sml "$corpus_poly"
 ```
 
@@ -736,9 +746,9 @@ Create local bindings from the example:
 cp experiments/stackvm/bindings.example.record _work/my-bindings.record
 ```
 
-Edit `poly.compiler` and `smlnj.compiler` in that file to absolute paths of
-validated stage-2 artifacts found with `compilers`. Preserve the tab separating
-each key and value. Leave `rune.compiler` set to `installed-rune`. Then preview:
+Edit `rune.compiler`, `poly.compiler` and `smlnj.compiler` in that file to absolute
+paths of validated stage-2 artifacts found with `compilers`. Preserve the tab
+separating each key and value. Then preview:
 
 ```sh
 bin/corpus bench --dry-run experiments/stackvm/demo.record _work/my-bindings.record
@@ -761,6 +771,17 @@ Reruns create a fresh experiment and fresh program builds. Keep the result
 directory and referenced program/compiler installations. Lifecycle `export`
 does not package experiments; archive their result directories separately,
 retaining the path context and prerequisites described in `REPORT.md`.
+
+For a small acceptance matrix that crosses the two Rune versions, fill the
+`rune-old` and `rune-new` bindings and run:
+
+```sh
+bin/corpus bench experiments/stackvm/rune-versions.record _work/my-bindings.record
+```
+
+It has two generator builders, two interpreter builders, sizes 3/9, ten
+iterations, one warmup and two samples. These tiny runs test independent version
+selection and VM pairing; they are not a useful performance ranking.
 
 ### Preserve and rerun a result
 
@@ -859,13 +880,15 @@ See [evidence and reruns](docs/evidence.md) for the retention policy.
 
 ## 5. Current boundaries
 
-The following is the validated scope at this manual's introduction on 2026-09-24.
+The following combines historical acceptance with current adapter support.
+Versioned Rune downstream validation is recorded separately in RESULTS.md.
 Local build progress and exact evidence paths belong in
 [implementation notes](docs/implementation.md); use records for the outcome of
 any particular run.
 
 | Area | Available behavior and remaining work |
 | --- | --- |
+| Rune | Both requested commit versions passed stages 1 and 2, smoke and self-reproduction. Programs, suites, benchmarks and cross-checks accept their explicit stage-2 artifacts and matching VMs. |
 | SML/NJ | Development 2026.2 and legacy 110.99.9 have passed stage-2 validation, harness cross-checks and the shared 113 assertions. |
 | Poly/ML | 5.9.2 has passed stage-2 validation, the selected upstream runner, the harness cross-check, the shared 113 assertions and the recorded seed-independence audit. |
 | MLton | 20241230 stages 1 and 2, selected upstream regressions and the harness cross-check have passed. The shared subset retains an investigated String.fromCString failure; see [known differences](packages/smlnj-regressions/95b939d/known-differences.md). |

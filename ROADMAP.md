@@ -26,7 +26,7 @@ The following milestones extend the completed initial roadmap:
 
 - [x] R1: Pin both requested Rune commits, build validated stages 1 and 2,
   and record the installed bootstrap seed and matching runtime/library bundle.
-- [ ] R2: Select corpus Rune artifacts in suites, programs, experiments and
+- [x] R2: Select corpus Rune artifacts in suites, programs, experiments and
   harness cross-checks; update profile bindings and the manual.
 - [ ] R3: Validate both versions alongside the reference compilers, preserve
   results and manual reruns, and record any discovered compatibility failures.

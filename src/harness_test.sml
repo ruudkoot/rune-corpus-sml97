@@ -25,7 +25,11 @@ struct
         "]; OS.Process.exit OS.Process.success) handle e => " ^
         "(TextIO.output (TextIO.stdErr, General.exnMessage e ^ \"\\n\"); OS.Process.exit OS.Process.failure));\n")
       val result = case family of
-        "smlnj" => command "SML/NJ harness tests" compiler [driver]
+        "rune" =>
+          let val bytecode = work ^ "/reference-tests.rbc"
+              val _ = command "compile harness tests with corpus Rune" compiler (sources @ ["-o", bytecode])
+          in command "corpus Rune harness tests" (Artifact.runeRuntime reference) [bytecode] end
+      | "smlnj" => command "SML/NJ harness tests" compiler [driver]
       | "polyml" => command "Poly/ML harness tests" compiler ["--script", driver]
       | "mlton" =>
           let val mlb = work ^ "/tests.mlb"
@@ -43,6 +47,8 @@ struct
       val () = Files.record (work ^ "/comparison.record",
         [("kind", "harness-cross-check"), ("reference.artifact", Files.absolute artifactPath),
          ("reference.content.sha256", Record.require reference "content.sha256"),
+         ("reference.family", family), ("reference.version", Record.require reference "version"),
+         ("harness.compiler", Process.resolve "rune"), ("harness.runtime", Process.resolve "runevm"),
          ("rune.logs", #directory runeResult), ("reference.logs", #directory result),
          ("normalization", "compare ordered PASS lines and require completion marker; retain all raw output"),
          ("status", if passed then "passed" else "test-failure")])

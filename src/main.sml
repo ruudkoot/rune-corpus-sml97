@@ -5,11 +5,11 @@ struct
     \       corpus report [ATTEMPT_DIRECTORY] | compilers | failures\n\
     \       corpus compare LEFT_ATTEMPT RIGHT_ATTEMPT | show RECORD | logs PATH TEXT\n\
     \       corpus export ATTEMPT_DIRECTORY NEW_ARCHIVE | cross-check COMPILER_ARTIFACT\n\
-    \       corpus program SOURCE.sml COMPILER_ARTIFACT_OR_installed-rune\n\
+    \       corpus program SOURCE.sml COMPILER_ARTIFACT\n\
     \       corpus execute PROGRAM_ARTIFACT [ARG ...]\n\
     \       corpus bench [--dry-run] EXPERIMENT_RECORD BINDINGS_RECORD\n\
     \       corpus profile PROFILE_RECORD [BINDINGS_RECORD]\n\
-    \       corpus run-suite METADATA SOURCE_DIRECTORY BUILD_DIRECTORY COMPILER_ARTIFACT_OR_installed-rune\n\
+    \       corpus run-suite METADATA SOURCE_DIRECTORY BUILD_DIRECTORY COMPILER_ARTIFACT\n\
     \       corpus --help\n\
     \See README.md for concepts, command details and workflows. run-suite is an internal recipe adapter.\n"
   fun main args =

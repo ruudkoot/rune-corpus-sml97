@@ -3,6 +3,7 @@ tests/graph.sml
 tests/artifacts.sml
 tests/system_artifacts.sml
 tests/lifecycle.sml
+tests/compiler.sml
 tests/suite.sml
 tests/experiment.sml
 tests/end.sml

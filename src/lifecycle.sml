@@ -68,7 +68,7 @@ struct
             in if Files.exists link then raise Fail ("duplicate native tool name: " ^ name)
                else Posix.FileSys.symlink {old = target, new = link} end)
             (Record.getStrings (Recipe.fields recipe) "tools")
-          val compilerKind = getOpt (Record.find (Recipe.fields recipe) "compiler.kind", "installed-rune")
+          val compilerKind = getOpt (Record.find (Recipe.fields recipe) "compiler.kind", "harness-rune")
           val parent = case (compilerKind, compilerPath) of
             ("external-rune-seed", NONE) =>
               if Recipe.get recipe "bootstrap.stage" = "1" andalso Recipe.get recipe "name" = "rune"
@@ -87,7 +87,7 @@ struct
             ("corpus", SOME path) => SOME (Artifact.compiler {steps = steps, path = path,
               allowBootstrap = Record.find (Recipe.fields recipe) "bootstrap.stage" = SOME "2"})
           | ("corpus", NONE) => raise Fail "this recipe requires an explicit corpus compiler artifact"
-          | ("installed-rune", NONE) => NONE
+          | ("harness-rune", NONE) => NONE
           | ("native-boot-files", NONE) => NONE
           | (_, SOME _) => raise Fail "this recipe does not accept a corpus compiler artifact"
           | _ => raise Fail ("unsupported compiler selection: " ^ compilerKind)

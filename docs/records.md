@@ -34,7 +34,7 @@ as text so timestamps and digests do not depend on the host's integer width.
 | failure-groups | Groups of similar observed diagnostics, method description and member attempt paths. These are investigation aids, not established root causes. |
 | profile | An ordered `tasks` list. Each task declares `.kind` (harness, recipe, cross-check or benchmark), `.timeout` and the relevant recipe/variant, compiler-binding name or experiment. Recipe/experiment paths resolve from the repository root. |
 | profile-result / profile-task | Overall and per-task verdicts, selected profile and bindings, orchestrator bytecode digest, times and child process log locations. Independent tasks continue after failure. |
-| stackvm-experiment / compiler-bindings | Independent generator/runtime alias lists, owned source paths, workload sizes, iterations, warmups, sample count and execution limits. Bindings resolve aliases to exact compiler artifacts (or installed Rune), with optional `ALIAS.arguments` lists for Rune/MLton program compilation. |
+| stackvm-experiment / compiler-bindings | Independent generator/runtime alias lists, owned source paths, workload sizes, iterations, warmups, sample count and execution limits. Bindings resolve aliases to exact compiler artifacts, including commit-versioned Rune, with optional `ALIAS.arguments` lists for Rune/MLton program compilation. |
 | experiment-plan / experiment-node-result | Ordered dependencies and recorded input identities, exclusions, shared builds, produced bytecode and run/result references. Sharing is confined to one experiment. |
 | benchmark-result / benchmark-configuration / benchmark-sample | Overall validity, configuration correctness and individual samples. Units are seconds and KiB; invalid configurations retain logs but are excluded from timing summaries. |
 
@@ -72,11 +72,12 @@ dependent steps. Independent attempts can be invoked separately.
 `x86_64-Linux`. `minimum.TOOL` requests a dotted numeric minimum version check.
 Tools declared in `tools` are fingerprinted separately from the global inventory.
 
-`compiler.kind` selects `installed-rune`, `native-boot-files`, `corpus`, or
-`external-seed`. The last is permitted only for stage-1 recipes and declares
+`compiler.kind` selects `harness-rune` (owned harness fixtures only),
+`native-boot-files`, `corpus`, `external-rune-seed`, or `external-seed`.
+`external-seed` is permitted only for stage-1 recipes and declares
 `compiler.external.path`, `.root` and `.roots`; its snapshot records stage 0.
-The current default is `installed-rune`; package recipes should state the kind
-explicitly. Corpus selection requires a fourth lifecycle argument naming the
+The fixture default is `harness-rune`; package recipes must state their compiler
+kind explicitly. Rune workload recipes use `corpus`. Corpus selection requires a fourth lifecycle argument naming the
 exact compiler artifact record. Its manifest and producing validation attempt
 are checked, then `{compiler}`, `{compiler.root}`, `{compiler.bin}` and `{compiler.record}` become
 available. The full parent record and its digest are preserved in the attempt.

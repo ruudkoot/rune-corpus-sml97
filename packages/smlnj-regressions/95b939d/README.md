@@ -26,11 +26,13 @@ contract](https://smlfamily.github.io/Basis/vector.html) does not require a
 representable integer above `maxLen`. This is a portable test-boundary correction.
 String's invalid-escape expectations remain unchanged.
 
-Recipes declare installed Rune or exact corpus-built compiler families/versions:
+Recipes select exact corpus-built compiler artifacts, including Rune commit versions:
 SML/NJ 2026.2 and 110.99.9, MLton 20241230, and Poly/ML 5.9.2. Run, for example:
 
+Set `corpus_rune` to the absolute path of a validated Rune stage-2 artifact.
+
 ```sh
-bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux
+bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux "$corpus_rune"
 bin/corpus test packages/smlnj-regressions/95b939d/smlnj.record amd64-linux PATH/TO/artifact.record
 ```
 

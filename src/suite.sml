@@ -8,10 +8,9 @@ struct
       val work = Files.freshDir (build ^ "/suites")
       val steps = work ^ "/steps"
       val () = Files.mkdir steps
-      val reference = if compilerArtifact = "installed-rune" then NONE
-        else SOME (Artifact.compiler {steps = steps, path = compilerArtifact, allowBootstrap = false})
-      val family = case reference of NONE => "rune" | SOME r => Record.require r "family"
-      val compiler = case reference of NONE => Process.resolve "rune" | SOME r => Record.require r "path"
+      val reference = Artifact.compiler {steps = steps, path = compilerArtifact, allowBootstrap = false}
+      val family = Record.require reference "family"
+      val compiler = Record.require reference "path"
       val common = [("kind", "correctness-suite"), ("suite", Files.absolute metadata),
         ("source", source), ("family", family), ("compiler.artifact", compilerArtifact)]
       val () = Files.record (work ^ "/result.record", ("status", "running") :: common)
@@ -48,7 +47,7 @@ struct
                       val _ = Lifecycle.required (record (command (name ^ ":compile") compiler
                         [file, "-o", out] directory) "compile")
                       val () = current := "run"
-                  in record (command (name ^ ":run") (Process.resolve "runevm") [out] directory) "run" end
+                  in record (command (name ^ ":run") (Artifact.runeRuntime reference) [out] directory) "run" end
               | "mlton" =>
                   let val out = directory ^ "/program"
                       val _ = Lifecycle.required (record (command (name ^ ":compile") compiler

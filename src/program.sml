@@ -20,8 +20,9 @@ struct
     let
       val root = Files.absolute root
       val source = Files.absolute source
-      val compilerArtifact = if compilerArtifact = "installed-rune" then compilerArtifact
-                             else Files.absolute compilerArtifact
+      val () = if compilerArtifact = "installed-rune" then raise Fail
+        "workloads require a corpus compiler artifact; installed Rune is for the harness and bootstrap" else ()
+      val compilerArtifact = Files.absolute compilerArtifact
       val work = Files.freshDir (root ^ "/_work/programs")
       val steps = work ^ "/steps"
       val () = Files.mkdir steps
@@ -31,26 +32,22 @@ struct
       val () = state "running" []
       fun buildProgram () =
         let
-          val compiler = if compilerArtifact = "installed-rune" then NONE else
-            SOME (Artifact.compiler {steps = steps, path = compilerArtifact, allowBootstrap = false})
-          val family = case compiler of NONE => "rune" | SOME r => Record.require r "family"
+          val compiler = Artifact.compiler {steps = steps, path = compilerArtifact, allowBootstrap = false}
+          val family = Record.require compiler "family"
           val () = if null extraArguments orelse family = "rune" orelse family = "mlton" then ()
             else raise Fail ("extra program compiler arguments are unsupported for " ^ family)
-          val executable = case compiler of NONE => Process.resolve "rune"
-            | SOME r => Record.require r "path"
+          val executable = Record.require compiler "path"
           val system = Provenance.inventory {steps = steps, destination = work ^ "/system.record"}
-          val () = Files.record (work ^ "/compiler-input.record", case compiler of
-            SOME r => r | NONE => ("kind", "installed-rune-compiler") ::
-              List.filter (fn (key, _) => key <> "kind") system)
+          val () = Files.record (work ^ "/compiler-input.record", compiler)
           val selected = Provenance.selectedTools steps nativeTools
           val () = Files.record (work ^ "/selected-tools.record", selected)
           val tools = work ^ "/host-tools"
           val () = Files.mkdir tools
           val () = List.app (fn name => Posix.FileSys.symlink
             {old = Process.resolve name, new = tools ^ "/" ^ name}) nativeTools
-          val env = ["PATH=" ^ (case compiler of NONE => "" | SOME _ => OS.Path.dir executable ^ ":") ^ tools,
-                     "TMPDIR=" ^ work, "RUNE=" ^ Process.resolve "rune",
-                     "RUNEVM=" ^ Process.resolve "runevm"] @
+          val env = ["PATH=" ^ OS.Path.dir executable ^ ":" ^ tools,
+                     "TMPDIR=" ^ work, "RUNE=" ^ (if family = "rune" then executable else Process.resolve "rune"),
+                     "RUNEVM=" ^ (if family = "rune" then Artifact.runeRuntime compiler else Process.resolve "runevm")] @
             List.filter (fn s => not (List.exists (fn p => String.isPrefix p s)
               ["PATH=", "TMPDIR=", "RUNE=", "RUNEVM="])) (Process.environment ())
           val original = Files.read source
@@ -86,7 +83,7 @@ struct
             "rune" =>
               let val () = Files.write (entry, original ^ tail)
                   val _ = run "compile" executable (extraArguments @ [entry, "-o", output ^ ".rbc"])
-              in (output ^ ".rbc", Process.resolve "runevm", [output ^ ".rbc"]) end
+              in (output ^ ".rbc", Artifact.runeRuntime compiler, [output ^ ".rbc"]) end
           | "mlton" =>
               let val () = Files.write (entry, original ^ tail)
                   val _ = run "compile-and-link" executable (extraArguments @ ["-output", output, entry])
@@ -144,8 +141,9 @@ struct
                     Record.require r "run.program.sha256" then ()
                  else raise Fail "program runtime executable changed"
         val parent = Record.require r "compiler.artifact"
-        val () = if parent = "installed-rune" then () else
-          ignore (Artifact.compiler {steps = steps, path = parent, allowBootstrap = false})
+        val () = if parent = "installed-rune" then raise Fail
+          "historical installed-Rune programs must be rebuilt with a corpus Rune artifact"
+          else ignore (Artifact.compiler {steps = steps, path = parent, allowBootstrap = false})
         val result = Process.run {parent = steps, label = "program execution",
           command = command {record = r, args = args, timeout = 120}}
         val () = Files.record (work ^ "/result.record", [("kind", "program-run"),

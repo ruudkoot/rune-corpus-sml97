@@ -17,6 +17,12 @@ will be absent in a fresh clone. Reruns create new IDs and preserve earlier
 attempts. The instructions below cover both reusing this checkout's compiler
 artifacts and rebuilding them elsewhere.
 
+The original acceptance tables below predate corpus-managed Rune versions.
+They retain their historical installed-Rune identities and measurements. Current
+workload commands require a Rune stage-2 artifact; the manual reruns below have
+been migrated accordingly and do not claim to replay that unidentified source
+revision. Installed Rune still builds/runs the harness and seeds Rune bootstrap.
+
 ## Contents
 
 - [Overall outcomes](#overall-outcomes)
@@ -25,6 +31,7 @@ artifacts and rebuilding them elsewhere.
 - [Basis correctness results](#basis-correctness-results)
 - [HaMLet application results](#hamlet-application-results)
 - [Benchmark results](#benchmark-results)
+- [Versioned Rune bootstrap results](#versioned-rune-bootstrap-results)
 - [How to rerun by hand](#how-to-rerun-by-hand)
 - [What remains to do](#what-remains-to-do)
 
@@ -371,6 +378,22 @@ Additional measured workloads and a quieter, controlled host are needed for
 credible comparative performance conclusions. System identities improve
 traceability; full environmental or byte-identical reproducibility is not claimed.
 
+## Versioned Rune bootstrap results
+
+Both requested commits passed the two-stage corpus build, smoke programs and
+stage-2 self-reproduction check. Source versions are the full commits, not their
+shared `0.3.0` banner. The stage-1 seed's compiler, VM and complete library are
+recorded and reverified after compilation. Stage 2 has its own freshly built VM.
+
+| Commit | Stage-2 artifact | Stage-1 parent |
+| --- | --- | --- |
+| `b5ec8c8833e906cd3fe636a49e20b7c8474596dc` | `_work/attempts/1790321939792559-276E2F-1/artifact.record` | `_work/attempts/1790321872605236-276806-1/artifact.record` |
+| `e840204151663baf1139c8096b566301e9ced37d` | `_work/attempts/1790321998750242-2779D1-1/artifact.record` | `_work/attempts/1790321939806686-276E37-1/artifact.record` |
+
+[The Rune package manual](packages/rune/README.md) explains the different hosting
+and target VMs in stage 1 and provides commands to rebuild both stages. These
+bootstrap results are distinct from downstream suites and benchmark validation.
+
 ## How to rerun by hand
 
 ### 1. Prepare the checkout and installed Rune
@@ -398,28 +421,27 @@ is inappropriate; this variable identifies the actual Basis/payload for records,
 and does not change the compiler's library search. Rebuild after replacing Rune.
 `bin/build` regenerates `corpus.mlb` for the LSP.
 
-For the self-contained quick check:
-
-```sh
-bin/corpus profile profiles/quick.record
-```
-
-Expected baseline outcome: status 0, two passed tasks. To run its constituent
-checks individually instead:
+For the self-contained harness checks:
 
 ```sh
 bin/test
-bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux
 ```
+
+The quick profile additionally needs a corpus Rune artifact and bindings. Build
+or select those in steps 2–3 before running it.
 
 A rerun tests the installation actually supplied now. Matching the historical
 version string alone is not an exact replay of the recorded installation.
 
 ### 2. Select reference artifacts
 
-For this existing checkout, these are the exact artifacts used above:
+For this existing checkout, these are the retained artifacts. The two Rune commits are new selections;
+`corpus_rune` chooses the newer one for current quick/regression/long runs:
 
 ```sh
+corpus_rune_old="$PWD/_work/attempts/1790321939792559-276E2F-1/artifact.record"
+corpus_rune_new="$PWD/_work/attempts/1790321998750242-2779D1-1/artifact.record"
+corpus_rune="$corpus_rune_new"
 corpus_modern="$PWD/_work/attempts/1790221321440436-1B95F3-1/artifact.record"
 corpus_legacy="$PWD/_work/attempts/1790179540943070-3C272F-1/artifact.record"
 corpus_mlton="$PWD/_work/attempts/1790261891601556-2AF41F-1/artifact.record"
@@ -432,9 +454,16 @@ These variables remain available only in that shell. Selection verifies the
 recorded installation and producing test outcome when the artifact is used.
 If the installations were moved, deleted or changed, a record copy alone will
 not restore them. Build fresh artifacts using the next subsection and set these
-four variables to their new absolute paths.
+compiler variables to their new absolute paths.
 
 #### Fresh reference builds
+
+For Rune, follow the same stage-1/stage-2 commands below using
+`packages/rune/b5ec8c8833e906cd3fe636a49e20b7c8474596dc` and
+`packages/rune/e840204151663baf1139c8096b566301e9ced37d`. Stage 1 uses installed
+Rune as its recorded external seed; stage 2 requires the same commit's validated
+stage 1. Set `corpus_rune_old` and `corpus_rune_new` to the resulting stage-2
+artifacts and choose `corpus_rune` explicitly. See [Rune build instructions](packages/rune/README.md).
 
 For each compiler, run `doctor` and `test` on its stage-1 recipe, then `test` on
 stage 2 using the artifact path printed by the successful stage-1 attempt.
@@ -475,14 +504,16 @@ review and update the stage-1 seed metadata; do not substitute an unrecorded see
 
 ### 3. Create local bindings and run the full profile
 
-After setting all four absolute artifact variables, this writes the tab-separated
+After setting the absolute artifact variables, this writes the tab-separated
 binding record used by the profile and benchmark commands:
 
 ```sh
 mkdir -p _work
-printf 'corpus-record-v1\nkind\tcompiler-bindings\nrune.compiler\tinstalled-rune\nsmlnj.compiler\t%s\nlegacy.compiler\t%s\nmlton.compiler\t%s\npoly.compiler\t%s\n' \
-  "$corpus_modern" "$corpus_legacy" "$corpus_mlton" "$corpus_poly" \
+printf 'corpus-record-v1\nkind\tcompiler-bindings\nrune.compiler\t%s\nsmlnj.compiler\t%s\nlegacy.compiler\t%s\nmlton.compiler\t%s\npoly.compiler\t%s\n' \
+  "$corpus_rune" "$corpus_modern" "$corpus_legacy" "$corpus_mlton" "$corpus_poly" \
   > _work/results-bindings.record
+printf 'rune-old.compiler\t%s\nrune-new.compiler\t%s\n' \
+  "$corpus_rune_old" "$corpus_rune_new" >> _work/results-bindings.record
 bin/corpus show _work/results-bindings.record
 ```
 
@@ -490,7 +521,14 @@ Alternatively, copy `profiles/bindings.example.record` and replace every placeho
 with the corresponding absolute artifact path. Preserve actual tab separators.
 Compiler paths in bindings resolve relative to the binding file, not the checkout.
 
-Run the full correctness selection and retain its exit status:
+Run the quick check and both Rune versions before the full reference comparison:
+
+```sh
+bin/corpus profile profiles/quick.record _work/results-bindings.record
+bin/corpus profile profiles/rune-versions.record _work/results-bindings.record
+```
+
+Then run the full correctness selection and retain its exit status:
 
 ```sh
 if bin/corpus profile profiles/regression.record _work/results-bindings.record; then
@@ -508,9 +546,12 @@ Always check the actual failed cases against the observations above.
 
 ### 4. Run individual cross-checks and suites
 
-These are the operations behind the profile, useful for a focused manual rerun:
+These operations are useful for a focused manual rerun. The Rune cross-checks
+compare each corpus version with the installed harness Rune:
 
 ```sh
+bin/corpus cross-check "$corpus_rune_old"
+bin/corpus cross-check "$corpus_rune_new"
 bin/corpus cross-check "$corpus_modern"
 bin/corpus cross-check "$corpus_legacy"
 bin/corpus cross-check "$corpus_mlton"
@@ -520,9 +561,10 @@ bin/corpus cross-check "$corpus_poly"
 Each should print `cross-check passed:` with a new directory. Read its
 `comparison.record` for the raw Rune/reference log locations.
 
-Run the shared suite under each reference:
+Run the shared suite under the selected Rune and each reference:
 
 ```sh
+bin/corpus test packages/smlnj-regressions/95b939d/rune.record amd64-linux "$corpus_rune"
 bin/corpus test packages/smlnj-regressions/95b939d/smlnj.record amd64-linux "$corpus_modern"
 bin/corpus test packages/smlnj-regressions/95b939d/smlnj.record amd64-linux "$corpus_legacy"
 bin/corpus test packages/smlnj-regressions/95b939d/mlton.record amd64-linux "$corpus_mlton"
@@ -537,7 +579,7 @@ For the expanded selection:
 
 ```sh
 corpus_suite=packages/smlnj-regressions/95b939d/suites/basis-expanded/1
-bin/corpus test "$corpus_suite/rune.record" amd64-linux
+bin/corpus test "$corpus_suite/rune.record" amd64-linux "$corpus_rune"
 bin/corpus test "$corpus_suite/smlnj.record" amd64-linux "$corpus_modern"
 bin/corpus test "$corpus_suite/smlnj.record" amd64-linux "$corpus_legacy"
 bin/corpus test "$corpus_suite/mlton.record" amd64-linux "$corpus_mlton"
@@ -549,7 +591,7 @@ Each invocation retains its new attempt and generated case programs. To rerun
 the application checks:
 
 ```sh
-bin/corpus test packages/hamlet/2.0.1/rune.record amd64-linux
+bin/corpus test packages/hamlet/2.0.1/rune.record amd64-linux "$corpus_rune"
 bin/corpus test packages/hamlet/2.0.1/polyml.record amd64-linux "$corpus_poly"
 ```
 
@@ -620,21 +662,19 @@ changes its relative-path context. Increase workload size/iterations when timing
 are near the timer resolution. Changes define a new experiment and must not be
 silently pooled with these observations.
 
-To repeat the small option/wrong-output/timeout acceptance experiments using
-this checkout's retained development fixtures:
+For an independent generator/runtime matrix across both Rune commits:
 
 ```sh
-bin/corpus bench _work/research/benchmark-validation/flags.record _work/research/benchmark-validation/bindings.record
-bin/corpus bench _work/research/benchmark-validation/wrong.record _work/research/benchmark-validation/bindings.record
-bin/corpus bench _work/research/benchmark-validation/timeout.record _work/research/benchmark-validation/bindings.record
+bin/corpus bench experiments/stackvm/rune-versions.record _work/results-bindings.record
 ```
 
-Run them individually: expected command statuses are 0, 1 and 1, respectively.
-Those fixture files are local development evidence, not currently tracked test
-assets; a clean clone lacks them. Their exact saved specifications/bindings and
-source snapshots remain in the three experiment directories listed above.
-The following commands recreate equivalent inputs in a fresh checkout using only
-installed Rune. Run from the repository root; this writes local fixtures beneath
+This is a small acceptance run, not a performance comparison.
+
+The original option/wrong-output/timeout fixtures under `_work/research/benchmark-validation/`
+used `installed-rune` bindings, which the current adapter rejects. Preserve them
+as historical evidence. The following commands recreate equivalent cases with
+the selected **corpus** Rune artifact, including in a fresh checkout after its
+bootstrap. Run from the repository root; this writes local fixtures beneath
 `_work/results-acceptance/`:
 
 ```sh
@@ -652,8 +692,8 @@ structure Program = struct
      print "CORPUS_STACK_RESULT 28\n"; OS.Process.success)
 end
 SML
-printf 'corpus-record-v1\nkind\tcompiler-bindings\nall.compiler\tinstalled-rune\nall.arguments.count\t2\nall.arguments.0\t--basis\nall.arguments.1\tall\nrune.compiler\tinstalled-rune\n' \
-  > "$corpus_acceptance/bindings.record"
+printf 'corpus-record-v1\nkind\tcompiler-bindings\nall.compiler\t%s\nall.arguments.count\t2\nall.arguments.0\t--basis\nall.arguments.1\tall\nrune.compiler\t%s\n' \
+  "$corpus_rune" "$corpus_rune" > "$corpus_acceptance/bindings.record"
 
 # Arguments: runtime source, deadline seconds, number of runtime choices, output.
 corpus_acceptance_spec() {
@@ -728,8 +768,8 @@ green, or the performance comparison conclusive. The most useful next work is:
 
 | Priority | Follow-up | Why / completion evidence |
 | --- | --- | --- |
-| 1 | Resolve or report the three investigated reference-library differences | Review the reduced MLton/Poly/ML cases against their linked specifications; use a new versioned compiler build or justified patch and rerun. Preserve the original failures. No upstream report or vendor fix is claimed here. |
-| 1 | Run a representative Rune performance comparison | Add Rune, MLton and legacy SML/NJ runtime choices and meaningful SML applications. The current main matrix has no Rune runtime row and measures only the owned stack workload. |
+| 1 | Retest reference-library corrections when compiler pins change | Upstream status is maintained in the linked known-difference investigations. Use a new versioned compiler build or justified patch and rerun; preserve the original failures. |
+| 1 | Run a representative Rune performance comparison | The two-version Rune acceptance matrix verifies selection only. Add longer Rune workloads, MLton and legacy SML/NJ runtime choices and meaningful SML applications. The current main matrix has no Rune runtime row and measures only the owned stack workload. |
 | 1 | Improve measurement conditions and coverage | Use a quieter host, longer workloads, documented CPU/cache policy and repeated fresh compilations. Collect enough independent runs to assess uncertainty before reporting speedups. |
 | 2 | Make the negative benchmark acceptance checks a committed test target | Their current inputs and driver are retained only under ignored `_work/research`; preserve the wrong-answer, timeout, option and unsupported-binding assertions for future checkouts. |
 | 2 | Integrate scheduled/CI runs and durable result retention | The caller contract exists; automatic Rune-repository invocation, uploaded artifacts and retention management have not been installed. Editing `../rune` requires human confirmation. |
